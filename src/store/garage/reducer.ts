@@ -11,7 +11,6 @@ const initialState: GarageState = {
   currentPage: 1,
   raceState: {
     status: 'idle',
-    page: null,
   },
   editingCar: null,
   resetVersion: 0,
@@ -56,14 +55,12 @@ const garageSlice = createSlice({
       }
     },
 
-    startRace(state, action: PayloadAction<number>) {
+    startRace(state) {
       state.raceState.status = 'starting';
-      state.raceState.page = action.payload;
     },
 
     resetRace(state) {
       state.raceState.status = 'resetting';
-      state.raceState.page = null;
       state.resetVersion += 1;
       state.cars.forEach(car => {
         car.positionX = 0;

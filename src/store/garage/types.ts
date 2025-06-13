@@ -24,5 +24,4 @@ export type RaceStatus = 'idle' | 'starting' | 'resetting';
 
 export interface RaceState {
   status: RaceStatus;
-  page: number | null;
 }

@@ -149,7 +149,7 @@ export const startRaceThunk = createAsyncThunk<
   CarType[],
   { dispatch: AppDispatch; state: RootState }
 >('garage/startRaceThunk', async (cars, { dispatch }) => {
-  dispatch(startRace(1));
+  dispatch(startRace());
   await Promise.all(cars.map(car => runSingleCarLogic(car.id, dispatch)));
 });
 
