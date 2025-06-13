@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../store/hooks';
 
-import { deleteCar, startSingleCarThunk } from '../../store/garage/actions';
+import { deleteCarThunk, startSingleCarThunk } from '../../store/garage/actions';
 import type { CarType } from '../../store/garage/types';
 import { updateCarPosition, updateCarStatus } from '../../store/garage/reducer';
 import { selectResetVersion } from '../../store/garage/selectors';
@@ -66,7 +66,7 @@ const CarTrack = ({ car }: Props) => {
   }, [car.id, car.status, dispatch]);
 
   const handleDelete = () => {
-    dispatch(deleteCar(car.id));
+    dispatch(deleteCarThunk(car.id));
   };
 
   const handleReset = async () => {

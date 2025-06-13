@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import type { AppDispatch, RootState } from '../../store';
 import { fetchWinners } from '../../store/winners/actions';
 import type { WinnerType } from '../../store/winners/types';
 import Button from '../../components/Button/Button';
 import styles from './WinnerPage.module.scss';
-import { useNavigate } from 'react-router-dom';
 import { CARS_PER_PAGE } from '../../utils/constants';
 
 const WinnerPage: React.FC = () => {

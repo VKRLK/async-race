@@ -2,9 +2,8 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
 import type { CarStatus, GarageState } from './types';
-import { fetchCars, createCar, updateCar, deleteCar, createRandomCars } from './actions';
+import { fetchCars, createCar, updateCar, deleteCarThunk } from './actions';
 
 const initialState: GarageState = {
   cars: [],
@@ -115,22 +114,19 @@ const garageSlice = createSlice({
           positionX: 0,
           status: 'stopped',
         }));
-        state.total = action.payload.total;
+        state.total = action.payload.totalCount;
       })
-      .addCase(createCar.fulfilled, (state, action) => {
-        state.cars.push(action.payload);
+      .addCase(createCar.fulfilled, state => {
+        state.total++;
       })
       .addCase(updateCar.fulfilled, (state, action) => {
         const idx = state.cars.findIndex(car => car.id === action.payload.id);
         if (idx !== -1) state.cars[idx] = action.payload;
         state.editingCar = null;
       })
-      .addCase(deleteCar.fulfilled, (state, action) => {
+      .addCase(deleteCarThunk.fulfilled, (state, action) => {
+        state.total--;
         state.cars = state.cars.filter(car => car.id !== action.payload);
-      })
-      .addCase(createRandomCars.fulfilled, (state, action) => {
-        state.cars.push(...action.payload);
-        state.total += action.payload.length;
       });
   },
 });

@@ -18,26 +18,38 @@ import {
   updateCarPosition,
   updateCarStatus,
   resetRace,
+  setCurrentPage,
 } from './reducer';
 import { setStartTime, setFinishTime } from '../winners/reducer';
 import type { CarType } from './types';
-import type { RootState } from '../index';
+import type { AppDispatch, RootState } from '../index';
 import { saveWinnerResult } from '../winners/actions';
+import { CARS_PER_PAGE } from '../../utils/constants';
+import type { Car } from '../../api/types';
+import { generateRandomCarName, generateRandomColor } from '../../utils/helpers';
 
-export const fetchCars = createAsyncThunk(
-  'garage/fetchCars',
-  async ({ page, limit }: { page: number; limit: number }) => {
-    const { cars, total } = await getCars(page, limit);
-    return { cars, total };
-  }
-);
+export const fetchCars = createAsyncThunk<
+  { cars: Car[]; totalCount: number },
+  { page: number },
+  { state: RootState }
+>('garage/fetchCars', async ({ page }) => {
+  const { cars, total } = await getCars(page, CARS_PER_PAGE);
+  return {
+    cars,
+    totalCount: total,
+  };
+});
 
-export const createCar = createAsyncThunk(
-  'garage/createCar',
-  async ({ name, color }: { name: string; color: string }) => {
-    return await apiCreateCar(name, color);
-  }
-);
+export const createCar = createAsyncThunk<
+  void,
+  { name: string; color: string },
+  { state: RootState; dispatch: AppDispatch }
+>('garage/createCar', async ({ name, color }, { dispatch, getState }) => {
+  await apiCreateCar(name, color);
+
+  const { currentPage } = getState().garage;
+  await dispatch(fetchCars({ page: currentPage }));
+});
 
 export const updateCar = createAsyncThunk(
   'garage/updateCar',
@@ -46,25 +58,40 @@ export const updateCar = createAsyncThunk(
   }
 );
 
-export const deleteCar = createAsyncThunk('garage/deleteCar', async (id: number) => {
-  await apiDeleteCar(id);
-  return id;
+export const deleteCarThunk = createAsyncThunk<
+  number,
+  number,
+  { state: RootState; dispatch: AppDispatch }
+>('garage/deleteCarThunk', async (carId, { getState, dispatch }) => {
+  const { currentPage, cars } = getState().garage;
+
+  await apiDeleteCar(carId);
+  const currentPageCars = cars.filter(car => car.id !== carId);
+
+  const isLastCarOnLastPage = currentPage > 1 && currentPageCars.length === 0;
+  const nextPage = isLastCarOnLastPage ? currentPage - 1 : currentPage;
+
+  dispatch(setCurrentPage(nextPage));
+  await dispatch(fetchCars({ page: nextPage }));
+
+  return carId;
 });
 
-export const createRandomCars = createAsyncThunk('garage/createRandomCars', async () => {
-  const randomName = () => `Car ${Math.random().toString(36).substring(2, 7)}`;
-  const randomColor = () =>
-    `#${Math.floor(Math.random() * 16777215)
-      .toString(16)
-      .padStart(6, '0')}`;
-
+//generate 100 random cars
+export const createRandomCars = createAsyncThunk<
+  void,
+  void,
+  { state: RootState; dispatch: AppDispatch }
+>('garage/createRandomCars', async (_, { dispatch, getState }) => {
   const cars = Array.from({ length: 100 }, () => ({
-    name: randomName(),
-    color: randomColor(),
+    name: generateRandomCarName(),
+    color: generateRandomColor(),
   }));
 
-  const created = await Promise.all(cars.map(({ name, color }) => apiCreateCar(name, color)));
-  return created;
+  await Promise.all(cars.map(({ name, color }) => apiCreateCar(name, color)));
+
+  const { currentPage } = getState().garage;
+  await dispatch(fetchCars({ page: currentPage }));
 });
 
 // Launch the engine and get initial velocity and distance
