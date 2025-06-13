@@ -95,7 +95,7 @@ export const createRandomCars = createAsyncThunk<
 });
 
 // Launch the engine and get initial velocity and distance
-const runSingleCarLogic = async (carId: number, dispatch: any) => {
+const runSingleCarLogic = async (carId: number, dispatch: AppDispatch) => {
   try {
     const startTime = Date.now();
     const { velocity, distance } = await startEngine(carId);
@@ -106,52 +106,52 @@ const runSingleCarLogic = async (carId: number, dispatch: any) => {
     const duration = distance / velocity / 1000;
     const targetX = 1000;
 
+    dispatch(START_ANIMATION({ id: carId, targetX, duration }));
+
     let driveSuccess = false;
 
     try {
       const driveResult = await drive(carId);
-      dispatch(updateCarStatus({ id: carId, status: 'drive' }));
-
       if (driveResult.success) {
         driveSuccess = true;
-        dispatch(START_ANIMATION({ id: carId, targetX, duration }));
-        // Call setFinishTime and saveWinnerResult after the drive is complete
+        dispatch(updateCarStatus({ id: carId, status: 'drive' }));
+
+        // ⏱ По завершении анимации считаем финиш
         setTimeout(() => {
           dispatch(setFinishTime({ id: carId, finishTime: Date.now() }));
           dispatch(saveWinnerResult({ id: carId, time: duration * 1000 }));
         }, duration * 1000);
-      } else {
-        console.warn(`Car ${carId} failed during drive:`, driveResult);
       }
     } catch (error) {}
 
     if (!driveSuccess) {
-      dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed' }));
+      dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed', startTime, duration }));
       dispatch(updateCarStatus({ id: carId, status: 'stopped' }));
     }
   } catch (error) {
-    console.warn(`Failed to start car ${carId}:`, error);
     dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
     dispatch(updateCarStatus({ id: carId, status: 'stopped' }));
   }
 };
 
-// 🚘 Thunk для запуска одной машины
-export const startSingleCarThunk = createAsyncThunk(
-  'garage/startSingleCarThunk',
-  async (carId: number, { dispatch }) => {
-    await runSingleCarLogic(carId, dispatch);
-  }
-);
+// Start a single car
+export const startSingleCarThunk = createAsyncThunk<
+  void,
+  number,
+  { dispatch: AppDispatch; state: RootState }
+>('garage/startSingleCarThunk', async (carId, { dispatch }) => {
+  await runSingleCarLogic(carId, dispatch);
+});
 
 // Start of all cars
-export const startRaceThunk = createAsyncThunk(
-  'garage/startRaceThunk',
-  async (cars: CarType[], { dispatch }) => {
-    dispatch(startRace(1));
-    await Promise.all(cars.map(car => runSingleCarLogic(car.id, dispatch)));
-  }
-);
+export const startRaceThunk = createAsyncThunk<
+  void,
+  CarType[],
+  { dispatch: AppDispatch; state: RootState }
+>('garage/startRaceThunk', async (cars, { dispatch }) => {
+  dispatch(startRace(1));
+  await Promise.all(cars.map(car => runSingleCarLogic(car.id, dispatch)));
+});
 
 // Reset all cars and their positions
 export const resetRaceThunk = createAsyncThunk(
