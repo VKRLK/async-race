@@ -1,6 +1,6 @@
 // src/pages/GaragePage.tsx
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchCars } from '../../store/garage/actions';
@@ -22,8 +22,30 @@ export function GaragePage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const trackContainerRef = useRef<HTMLDivElement>(null);
+  const [trackWidth, setTrackWidth] = useState(800);
+
   useEffect(() => {
-    dispatch(fetchCars({ page, limit: CARS_PER_PAGE }));
+    const el = trackContainerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.contentRect.width) {
+          setTrackWidth(entry.contentRect.width);
+        }
+      }
+    });
+
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchCars({ page }));
   }, [dispatch, location, page]);
 
   return (
@@ -35,7 +57,7 @@ export function GaragePage() {
         className={styles.button}
         hideTextOnMobile={false}
       />
-      <RaceControlPanel paginatedCars={cars} />
+      <RaceControlPanel paginatedCars={cars} trackWidth={trackWidth} />
 
       <CarEditor mode="create" />
 
@@ -52,11 +74,13 @@ export function GaragePage() {
         </button>
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {cars.map(car => (
-          <CarTrack key={car.id} car={car} />
-        ))}
-      </ul>
+      <div ref={trackContainerRef} className={styles.trackContainer}>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {cars.map(car => (
+            <CarTrack key={car.id} car={car} trackWidth={trackWidth} />
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

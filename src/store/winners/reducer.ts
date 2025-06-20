@@ -31,6 +31,7 @@ const winnersSlice = createSlice({
   initialState,
   reducers: {
     setStartTime: (state, action: PayloadAction<{ id: number; startTime: number }>) => {
+      console.log('setStartTime winners action', action.payload);
       const { id, startTime } = action.payload;
       if (!state.winner[id]) {
         state.winner[id] = { id, startTime };

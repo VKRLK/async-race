@@ -8,3 +8,7 @@ export const selectEditingCar = (state: RootState) => state.garage.editingCar;
 export const selectCurrentPage = (state: RootState) => state.garage.currentPage;
 export const selectRaceState = (state: RootState) => state.garage.raceState;
 export const selectResetVersion = (state: RootState) => state.garage.resetVersion;
+export const selectCarPosition = (id: number) => (state: RootState) => {
+  const car = state.garage.cars.find(car => car.id === id);
+  return car?.status?.position ?? 0;
+};

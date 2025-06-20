@@ -6,13 +6,14 @@ import type { CarType } from '../../store/garage/types';
 
 type Props = {
   paginatedCars: CarType[];
+  trackWidth: number;
 };
 
-const RaceControlPanel = ({ paginatedCars }: Props) => {
+const RaceControlPanel = ({ paginatedCars, trackWidth }: Props) => {
   const dispatch = useAppDispatch();
 
   const handleStartAll = () => {
-    dispatch(startRaceThunk(paginatedCars));
+    dispatch(startRaceThunk({ cars: paginatedCars, trackWidth }));
   };
 
   const handleResetAll = () => {

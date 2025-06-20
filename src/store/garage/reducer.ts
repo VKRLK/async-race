@@ -1,5 +1,3 @@
-// src/store/garage/reducer.ts
-
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { CarStatus, GarageState } from './types';
@@ -27,14 +25,10 @@ const garageSlice = createSlice({
       state.editingCar = null;
     },
 
-    updateCarPosition(state, action: PayloadAction<{ id: number; positionX: number }>) {
-      const { id, positionX } = action.payload;
-      const idx = state.cars.findIndex(car => car.id === id);
-      if (idx !== -1) {
-        state.cars[idx] = {
-          ...state.cars[idx],
-          positionX,
-        };
+    updateCarPosition: (state, action: PayloadAction<{ id: number; position: number }>) => {
+      const car = state.cars.find(c => c.id === action.payload.id);
+      if (car && typeof car.status === 'object') {
+        car.status.position = action.payload.position;
       }
     },
 
@@ -44,14 +38,39 @@ const garageSlice = createSlice({
     ) {
       const car = state.cars.find(c => c.id === action.payload.id);
       if (car) {
-        car.status = action.payload.status;
+        car.status = {
+          ...car.status,
+          status: action.payload.status,
+        };
       }
     },
 
     updateCarStatus(state, action: PayloadAction<{ id: number; status: CarStatus }>) {
       const car = state.cars.find(c => c.id === action.payload.id);
       if (car) {
-        car.status = action.payload.status;
+        car.status = {
+          ...car.status,
+          ...action.payload.status,
+        };
+      }
+    },
+    setStartTime: (state, action: PayloadAction<{ id: number; startTime: number }>) => {
+      console.log('setStartTime');
+      const { id, startTime } = action.payload;
+      const car = state.cars.find(c => c.id === id);
+      if (car) {
+        car.status = {
+          ...car.status,
+          startTime,
+          status: car.status?.status ?? 'stopped',
+        };
+      }
+    },
+
+    setFinishTime: (state, action: PayloadAction<{ id: number; finishTime: number }>) => {
+      const car = state.cars.find(c => c.id === action.payload.id);
+      if (car && typeof car.status === 'object') {
+        car.status.finishTime = action.payload.finishTime;
       }
     },
 
@@ -64,7 +83,7 @@ const garageSlice = createSlice({
       state.resetVersion += 1;
       state.cars.forEach(car => {
         car.positionX = 0;
-        car.status = 'stopped';
+        car.status = { status: 'stopped', position: 0 };
       });
     },
 
@@ -78,6 +97,7 @@ const garageSlice = createSlice({
         car.duration = action.payload.duration;
       }
     },
+
     STOP_ANIMATION(
       state,
       action: PayloadAction<{
@@ -95,10 +115,15 @@ const garageSlice = createSlice({
         const elapsedMs = Date.now() - startTime;
         const ratio = Math.min(elapsedMs / (duration * 1000), 1);
         car.positionX = Math.round((car.positionX ?? 0) * ratio);
+        // также обновим position в status
+        if (typeof car.status === 'object') {
+          car.status.position = car.positionX;
+        }
       }
 
       delete car.duration;
     },
+
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
     },
@@ -109,7 +134,7 @@ const garageSlice = createSlice({
         state.cars = action.payload.cars.map(car => ({
           ...car,
           positionX: 0,
-          status: 'stopped',
+          status: { status: 'stopped', position: 0, startTime: undefined },
         }));
         state.total = action.payload.totalCount;
       })
@@ -138,6 +163,8 @@ export const {
   STOP_ANIMATION,
   updateCarStatus,
   setCarStatus,
+  setStartTime,
+  setFinishTime,
   setCurrentPage,
 } = garageSlice.actions;
 

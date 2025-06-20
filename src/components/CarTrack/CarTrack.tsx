@@ -1,4 +1,4 @@
-//CarTrack.tsx
+// src/components/CarTrack/CarTrack.tsx
 
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,18 +12,73 @@ import { setFinishTime } from '../../store/winners/reducer';
 import { stopEngine } from '../../api/api';
 
 import CarEditor from '../CarEditor/CarEditor';
+import { saveWinnerResult } from '../../store/winners/actions';
 
 type Props = {
   car: CarType;
+  trackWidth: number;
 };
 
-const CarTrack = ({ car }: Props) => {
+const CarTrack = ({ car, trackWidth }: Props) => {
   const dispatch = useAppDispatch();
   const carRef = useRef<HTMLDivElement>(null);
+  const finishLineOffset = trackWidth * 0.9;
+  const startTimeRef = useRef<number | undefined>(car.status?.startTime);
+  const finishLineXRef = useRef<number>(0);
+
   const [isEditing, setIsEditing] = useState(false);
   const resetVersion = useSelector(selectResetVersion);
 
-  // Car movement animation
+  // Initialize finish line position based on the track width
+  useEffect(() => {
+    if (carRef.current) {
+      const parentLeft = carRef.current.parentElement?.getBoundingClientRect().left ?? 0;
+      finishLineXRef.current = parentLeft + finishLineOffset;
+      console.log(`Car ${car.id} finishLineX = ${finishLineXRef.current}`);
+    }
+  }, [finishLineOffset]);
+
+  // Set the start time when the car status changes to 'drive'
+  useEffect(() => {
+    startTimeRef.current = car.status?.startTime;
+  }, [car.status?.startTime]);
+
+  // Check position and finish line crossing
+  useEffect(() => {
+    let animationFrameId: number;
+    let hasFinished = false;
+
+    const trackPosition = () => {
+      if (carRef.current) {
+        const x = carRef.current.getBoundingClientRect().left;
+        dispatch(updateCarPosition({ id: car.id, position: x }));
+
+        if (!hasFinished && car.status?.status === 'drive' && x >= finishLineXRef.current) {
+          console.log(`Car ${car.id} crossed the finish line at position ${x}`);
+          hasFinished = true;
+          const finishTime = Date.now();
+          dispatch(setFinishTime({ id: car.id, finishTime }));
+
+          const start = startTimeRef.current;
+          if (start) {
+            console.log(`Car ${car.id} finished at ${finishTime}, started at ${start}`);
+            const raceTime = finishTime - start;
+            dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(trackPosition);
+    };
+
+    if (car.status?.status === 'drive') {
+      animationFrameId = requestAnimationFrame(trackPosition);
+    }
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [car.id, car.status?.status, dispatch]);
+
+  // Car position update animation effect
   useEffect(() => {
     if (!carRef.current) return;
 
@@ -42,28 +97,12 @@ const CarTrack = ({ car }: Props) => {
     }
   }, [car.positionX, car.duration]);
 
-  // Car reset effect
+  // Reset car position and style when resetVersion changes
   useEffect(() => {
     if (!carRef.current) return;
     carRef.current.style.transition = 'none';
     carRef.current.style.transform = 'translateX(0)';
   }, [resetVersion]);
-
-  // Dispatch finish time when car finishes driving
-  useEffect(() => {
-    const el = carRef.current;
-    if (!el) return;
-
-    const handleTransitionEnd = () => {
-      if (car.status === 'drive') {
-        const finishTime = Date.now();
-        dispatch(setFinishTime({ id: car.id, finishTime }));
-      }
-    };
-
-    el.addEventListener('transitionend', handleTransitionEnd);
-    return () => el.removeEventListener('transitionend', handleTransitionEnd);
-  }, [car.id, car.status, dispatch]);
 
   const handleDelete = () => {
     dispatch(deleteCarThunk(car.id));
@@ -72,7 +111,7 @@ const CarTrack = ({ car }: Props) => {
   const handleReset = async () => {
     try {
       await stopEngine(car.id);
-      dispatch(updateCarStatus({ id: car.id, status: 'stopped' }));
+      dispatch(updateCarStatus({ id: car.id, status: { status: 'stopped' } }));
     } catch (err) {
       console.warn(`Stop failed for car ${car.id}:`, err);
     }
@@ -82,11 +121,11 @@ const CarTrack = ({ car }: Props) => {
       carRef.current.style.transform = 'translateX(0)';
     }
 
-    dispatch(updateCarPosition({ id: car.id, positionX: 0 }));
+    dispatch(updateCarPosition({ id: car.id, position: 0 }));
   };
 
   const handleStart = () => {
-    dispatch(startSingleCarThunk(car.id));
+    dispatch(startSingleCarThunk({ carId: car.id, trackWidth }));
   };
 
   return (
@@ -110,9 +149,28 @@ const CarTrack = ({ car }: Props) => {
         )}
       </div>
 
-      <span style={{ color: car.color, marginRight: '1rem' }}>({car.status})</span>
+      <span style={{ color: car.color, marginRight: '1rem' }}>({car.status?.status})</span>
 
-      <div style={{ display: 'flex', alignItems: 'center', overflow: 'hidden', width: '80vw' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden',
+          width: '80vw',
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            left: `${finishLineOffset}px`,
+            top: 0,
+            bottom: 0,
+            width: '4px',
+            background: 'red',
+            zIndex: 1,
+          }}
+        />
         <div
           ref={carRef}
           style={{
@@ -120,6 +178,7 @@ const CarTrack = ({ car }: Props) => {
             height: '30px',
             backgroundColor: car.color,
             borderRadius: '4px',
+            zIndex: 2,
           }}
         />
       </div>
@@ -128,7 +187,7 @@ const CarTrack = ({ car }: Props) => {
         <button onClick={handleReset}>Reset</button>
         <button
           onClick={handleStart}
-          disabled={car.status !== 'stopped'}
+          disabled={car.status?.status !== 'stopped'}
           style={{ marginLeft: '0.5rem' }}
         >
           Start

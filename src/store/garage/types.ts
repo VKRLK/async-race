@@ -1,6 +1,11 @@
 //src/store/garage/types.ts
 
-export type CarStatus = 'started' | 'stopped' | 'drive';
+export type CarStatus = {
+  status: 'stopped' | 'started' | 'drive';
+  startTime?: number;
+  finishTime?: number;
+  position?: number;
+};
 
 export type CarType = {
   id: number;
