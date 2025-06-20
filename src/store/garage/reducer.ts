@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { CarStatus, GarageState } from './types';
+import type { CarStatus, CarType, GarageState } from './types';
 import { fetchCars, createCar, updateCar, deleteCarThunk } from './actions';
 
 const initialState: GarageState = {
@@ -55,7 +55,6 @@ const garageSlice = createSlice({
       }
     },
     setStartTime: (state, action: PayloadAction<{ id: number; startTime: number }>) => {
-      console.log('setStartTime');
       const { id, startTime } = action.payload;
       const car = state.cars.find(c => c.id === id);
       if (car) {
@@ -127,6 +126,9 @@ const garageSlice = createSlice({
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.currentPage = action.payload;
     },
+    setFetchedCarsWithPersistence(state, action: PayloadAction<CarType[]>) {
+      state.cars = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -166,6 +168,7 @@ export const {
   setStartTime,
   setFinishTime,
   setCurrentPage,
+  setFetchedCarsWithPersistence,
 } = garageSlice.actions;
 
 export default garageSlice.reducer;

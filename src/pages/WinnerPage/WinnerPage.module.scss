@@ -1,0 +1,29 @@
+/* src/pages/WinnerPage/WinnerPage.module.scss */
+
+.winnerPage {
+  padding: 1.5rem;
+}
+
+.navButton {
+  margin-bottom: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}

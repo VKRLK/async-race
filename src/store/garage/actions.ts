@@ -94,7 +94,7 @@ export const createRandomCars = createAsyncThunk<
 });
 
 // Launch the engine and get initial velocity and distance
-const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
+/* const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
   try {
     const startTime = Date.now();
     const { velocity, distance } = await startEngine(carId);
@@ -118,6 +118,38 @@ const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidt
     } catch {}
 
     if (!driveSuccess) {
+      dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed', startTime, duration }));
+      dispatch(updateCarStatus({ id: carId, status: { status: 'stopped' } }));
+    }
+  } catch {
+    dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
+    dispatch(updateCarStatus({ id: carId, status: { status: 'stopped' } }));
+  }
+}; */
+
+const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
+  try {
+    const startTime = Date.now();
+    const { velocity, distance } = await startEngine(carId);
+
+    dispatch(setStartTime({ id: carId, startTime }));
+    dispatch(updateCarStatus({ id: carId, status: { status: 'started' } }));
+
+    const duration = distance / velocity / 1000;
+    const targetX = trackWidth * 0.9;
+
+    // ⏩ Начинаем анимацию и ставим drive сразу
+    dispatch(START_ANIMATION({ id: carId, targetX, duration }));
+    dispatch(updateCarStatus({ id: carId, status: { status: 'drive', startTime } }));
+
+    // ⚠️ Пытаемся отправить команду на drive
+    try {
+      const driveResult = await drive(carId);
+      if (!driveResult.success) {
+        throw new Error('Drive failed');
+      }
+    } catch {
+      // ⛔ если drive не прошёл — остановим машину
       dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed', startTime, duration }));
       dispatch(updateCarStatus({ id: carId, status: { status: 'stopped' } }));
     }

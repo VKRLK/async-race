@@ -25,7 +25,6 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   const finishLineOffset = trackWidth * 0.9;
   const startTimeRef = useRef<number | undefined>(car.status?.startTime);
   const finishLineXRef = useRef<number>(0);
-
   const [isEditing, setIsEditing] = useState(false);
   const resetVersion = useSelector(selectResetVersion);
 
@@ -34,7 +33,6 @@ const CarTrack = ({ car, trackWidth }: Props) => {
     if (carRef.current) {
       const parentLeft = carRef.current.parentElement?.getBoundingClientRect().left ?? 0;
       finishLineXRef.current = parentLeft + finishLineOffset;
-      console.log(`Car ${car.id} finishLineX = ${finishLineXRef.current}`);
     }
   }, [finishLineOffset]);
 
@@ -44,6 +42,8 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   }, [car.status?.startTime]);
 
   // Check position and finish line crossing
+
+  //old
   useEffect(() => {
     let animationFrameId: number;
     let hasFinished = false;
@@ -52,16 +52,27 @@ const CarTrack = ({ car, trackWidth }: Props) => {
       if (carRef.current) {
         const x = carRef.current.getBoundingClientRect().left;
         dispatch(updateCarPosition({ id: car.id, position: x }));
+        if (car.status?.status) {
+          dispatch(
+            updateCarStatus({
+              id: car.id,
+              status: {
+                status: car.status.status,
+                position: x,
+                startTime: car.status.startTime,
+                finishTime: car.status.finishTime,
+              },
+            })
+          );
+        }
 
         if (!hasFinished && car.status?.status === 'drive' && x >= finishLineXRef.current) {
-          console.log(`Car ${car.id} crossed the finish line at position ${x}`);
           hasFinished = true;
           const finishTime = Date.now();
           dispatch(setFinishTime({ id: car.id, finishTime }));
 
           const start = startTimeRef.current;
           if (start) {
-            console.log(`Car ${car.id} finished at ${finishTime}, started at ${start}`);
             const raceTime = finishTime - start;
             dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
           }

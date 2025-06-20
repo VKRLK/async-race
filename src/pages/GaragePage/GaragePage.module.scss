@@ -1,0 +1,27 @@
+/* src/pages/GaragePage.module.scss */
+
+.garagePage {
+  padding: 1.5rem;
+}
+
+.navButton {
+  margin-bottom: 1.5rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.trackContainer {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.trackList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
