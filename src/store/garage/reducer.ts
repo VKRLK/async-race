@@ -112,7 +112,7 @@ const garageSlice = createSlice({
 
       const { startTime, duration } = action.payload;
       if (startTime != null && duration != null) {
-        const elapsedMs = Date.now() - startTime;
+        const elapsedMs = performance.timeOrigin + performance.now() - startTime;
         const ratio = Math.min(elapsedMs / (duration * 1000), 1);
 
         const targetX = car.positionX ?? 0;

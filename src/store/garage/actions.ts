@@ -21,7 +21,7 @@ import {
 import { saveWinnerResult } from '../winners/actions';
 import type { CarType } from './types';
 import type { AppDispatch, RootState } from '../index';
-import { CARS_PER_PAGE } from '../../utils/constants';
+import { CARS_PER_PAGE, VISUAL_FRAME_OFFSET_MS } from '../../utils/constants';
 import type { Car } from '../../api/types';
 import { generateRandomCarName, generateRandomColor } from '../../utils/helpers';
 
@@ -92,8 +92,8 @@ export const createRandomCars = createAsyncThunk<
 
 const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
   try {
-    const startTime = Date.now();
     const { velocity, distance } = await startEngine(carId);
+    const startTime = performance.timeOrigin + performance.now();
 
     dispatch(setStartTime({ id: carId, startTime }));
     dispatch(
@@ -115,7 +115,7 @@ const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidt
       const driveResult = await drive(carId);
       if (!driveResult.success) throw new Error('Drive failed');
 
-      const finishTime = Date.now();
+      const finishTime = performance.timeOrigin + performance.now() - VISUAL_FRAME_OFFSET_MS;
       const raceTime = finishTime - startTime;
 
       dispatch(saveWinnerResult({ id: carId, time: raceTime }));

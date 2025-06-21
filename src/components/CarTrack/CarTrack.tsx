@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../store/hooks';
 
+import type { RootState } from '../../store';
 import { startSingleCarThunk } from '../../store/garage/actions';
 import type { CarType } from '../../store/garage/types';
 import { updateCarPosition, updateCarStatus } from '../../store/garage/reducer';
@@ -30,6 +31,7 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   const finishLineXRef = useRef<number>(0);
   const resetVersion = useSelector(selectResetVersion);
   const [elapsed, setElapsed] = useState(0);
+  const winner = useSelector((state: RootState) => state.winners.winner[car.id]);
 
   // Анимация движения
   useCarMovement(car, carRef);
@@ -110,7 +112,7 @@ const CarTrack = ({ car, trackWidth }: Props) => {
 
       if (!hasFinished && car.status?.status === 'drive' && x >= finishLineXRef.current) {
         hasFinished = true;
-        const finishTime = Date.now();
+        const finishTime = performance.timeOrigin + performance.now();
         dispatch(setFinishTime({ id: car.id, finishTime }));
 
         const start = startTimeRef.current;
@@ -175,6 +177,10 @@ const CarTrack = ({ car, trackWidth }: Props) => {
 
       {car.status?.hasFailed ? (
         <span style={{ color: 'red' }}>Engine failure</span>
+      ) : winner?.startTime && winner?.finishTime ? (
+        <span style={{ color: car.color }}>
+          {((winner.finishTime - winner.startTime) / 1000).toFixed(2)} sec
+        </span>
       ) : car.status?.status === 'drive' && car.duration !== undefined ? (
         <span style={{ color: car.color }}>{elapsed.toFixed(2)} sec</span>
       ) : null}

@@ -12,8 +12,7 @@ import type { WinnerDisplay } from '../../store/winners/actions';
 import Button from '../../components/Button/Button';
 import styles from './WinnerPage.module.scss';
 import type { WinnerType } from '../../store/winners/types';
-
-const WINNERS_PER_PAGE = 10;
+import { WINNERS_PER_PAGE } from '../../utils/constants';
 
 const WinnerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
