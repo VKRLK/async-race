@@ -5,6 +5,10 @@ import type { Car, EngineStartResponse, DriveResponse, Winner } from './types';
 import { request } from '../utils/helpers';
 
 // ==== Garage ====
+export async function getCar(id: number): Promise<Car> {
+  return request<Car>(`${BACKEND_URL}/garage/${id}`);
+}
+
 export async function getCars(
   page: number,
   limit: number
@@ -57,15 +61,31 @@ export async function drive(id: number): Promise<DriveResponse> {
 }
 
 // ==== Winners ====
-export async function getWinners(page: number, limit: number): Promise<Winner[]> {
-  const url = `${BACKEND_URL}/winners?_page=${page}&_limit=${limit}`;
-  const response = await fetch(url, { cache: 'no-store' });
+export async function getWinners(
+  page: number,
+  limit: number,
+  sort?: keyof Winner,
+  order: 'asc' | 'desc' = 'asc'
+): Promise<{ winners: Winner[]; total: number }> {
+  const params = new URLSearchParams({
+    _page: String(page),
+    _limit: String(limit),
+    ...(sort && { _sort: sort }),
+    ...(order && { _order: order }),
+  });
+
+  const response = await fetch(`${BACKEND_URL}/winners?${params.toString()}`, {
+    cache: 'no-store',
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch winners: ${response.statusText}`);
   }
 
-  return await response.json();
+  const total = Number(response.headers.get('X-Total-Count')) || 0;
+  const winners = await response.json();
+
+  return { winners, total };
 }
 
 export async function getWinner(id: number): Promise<Winner | null> {

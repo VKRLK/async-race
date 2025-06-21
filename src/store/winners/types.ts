@@ -5,3 +5,11 @@ export type WinnerType = {
   wins: number;
   time: number;
 };
+
+export type WinnerDisplay = {
+  id: number;
+  name: string;
+  color: string;
+  wins: number;
+  time: number;
+};

@@ -1,17 +1,19 @@
 // src/pages/WinnerPage/WinnerPage.tsx
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
 import type { AppDispatch, RootState } from '../../store';
+
 import { fetchWinners } from '../../store/winners/actions';
 import { setCurrentPage } from '../../store/garage/reducer';
-import type { WinnerType } from '../../store/winners/types';
+import type { WinnerDisplay } from '../../store/winners/actions';
 
 import Button from '../../components/Button/Button';
 import styles from './WinnerPage.module.scss';
-import { CARS_PER_PAGE } from '../../utils/constants';
+import type { WinnerType } from '../../store/winners/types';
+
+const WINNERS_PER_PAGE = 10;
 
 const WinnerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,6 +23,8 @@ const WinnerPage: React.FC = () => {
   const loading = useSelector((state: RootState) => state.winners.loading);
   const error = useSelector((state: RootState) => state.winners.error);
   const page = useSelector((state: RootState) => state.garage.currentPage);
+  const [sortField, setSortField] = useState<keyof WinnerType>('wins');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     const savedPage = Number(localStorage.getItem('winnersCurrentPage'));
@@ -34,16 +38,25 @@ const WinnerPage: React.FC = () => {
   }, [page]);
 
   useEffect(() => {
-    dispatch(fetchWinners({ page, limit: CARS_PER_PAGE }));
-  }, [dispatch, page]);
+    dispatch(fetchWinners({ page, limit: WINNERS_PER_PAGE, sort: sortField, order: sortOrder }));
+  }, [dispatch, page, sortField, sortOrder]);
 
   const handlePrev = () => {
     if (page > 1) dispatch(setCurrentPage(page - 1));
   };
 
   const handleNext = () => {
-    if (winners.length === CARS_PER_PAGE) {
+    if (winners.length === WINNERS_PER_PAGE) {
       dispatch(setCurrentPage(page + 1));
+    }
+  };
+
+  const handleSort = (field: 'wins' | 'time') => {
+    if (sortField === field) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
     }
   };
 
@@ -67,17 +80,35 @@ const WinnerPage: React.FC = () => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Wins</th>
-                <th>Best Time (s)</th>
+                <th>№</th>
+                <th>Car</th>
+                <th>Name</th>
+                <th onClick={() => handleSort('wins')} style={{ cursor: 'pointer' }}>
+                  Wins {sortField === 'wins' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('time')} style={{ cursor: 'pointer' }}>
+                  Best Time (s) {sortField === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {winners.map((winner: WinnerType) => (
+              {winners.map((winner: WinnerDisplay, index: number) => (
                 <tr key={winner.id}>
-                  <td>{winner.id}</td>
+                  <td>{(page - 1) * WINNERS_PER_PAGE + index + 1}</td>
+                  <td>
+                    <div
+                      style={{
+                        width: '30px',
+                        height: '16px',
+                        backgroundColor: winner.color,
+                        borderRadius: '4px',
+                        margin: '0 auto',
+                      }}
+                    />
+                  </td>
+                  <td>{winner.name}</td>
                   <td>{winner.wins}</td>
-                  <td>{(winner.time / 1000).toFixed(2)}</td>
+                  <td>{winner.time >= 999999 ? '—' : (winner.time / 1000).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -88,7 +119,7 @@ const WinnerPage: React.FC = () => {
               Prev
             </button>
             <span>Page {page}</span>
-            <button onClick={handleNext} disabled={winners.length < CARS_PER_PAGE}>
+            <button onClick={handleNext} disabled={winners.length < WINNERS_PER_PAGE}>
               Next
             </button>
           </div>

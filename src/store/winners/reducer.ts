@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { fetchWinners } from './actions';
-import type { WinnerType } from './types';
+import type { WinnerDisplay } from './types';
 
 export type Winner = {
   id: number;
@@ -14,7 +14,7 @@ export type Winner = {
 
 type WinnersState = {
   winner: Record<number, Winner>;
-  winnerList: WinnerType[];
+  winnerList: WinnerDisplay[];
   loading: boolean;
   error: string | null;
 };
@@ -56,7 +56,7 @@ const winnersSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchWinners.fulfilled, (state, action: PayloadAction<WinnerType[]>) => {
+      .addCase(fetchWinners.fulfilled, (state, action: PayloadAction<WinnerDisplay[]>) => {
         state.loading = false;
         state.winnerList = action.payload;
       })
