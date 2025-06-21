@@ -1,3 +1,5 @@
+// src/pages/GaragePage/GaragePage.tsx
+
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +56,7 @@ export function GaragePage() {
     localStorage.setItem('garageCurrentPage', String(page));
   }, [page]);
 
-  // Fetch cars + restore their state
+  // Fetch cars + restore state from localStorage
   useEffect(() => {
     const pageKey = `carPositions_page_${page}`;
     const persistedCars = JSON.parse(localStorage.getItem(pageKey) || '[]');
@@ -67,7 +69,10 @@ export function GaragePage() {
         return {
           ...car,
           positionX: persisted?.positionX ?? 0,
-          status: persisted?.status ?? { status: 'stopped', position: 0 },
+          status:
+            persisted?.status?.status === 'drive'
+              ? { status: 'stopped', position: persisted?.status?.position ?? 0 }
+              : (persisted?.status ?? { status: 'stopped', position: 0 }),
         };
       });
 
@@ -76,7 +81,7 @@ export function GaragePage() {
     });
   }, [dispatch, page]);
 
-  // Save car state
+  // Save car state on change
   useEffect(() => {
     const pageKey = `carPositions_page_${page}`;
     if (wasRestored.current && cars.length > 0) {

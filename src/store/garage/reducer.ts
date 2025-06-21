@@ -1,3 +1,4 @@
+//src\store\garage\reducer.ts
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { CarStatus, CarType, GarageState } from './types';
@@ -113,10 +114,13 @@ const garageSlice = createSlice({
       if (startTime != null && duration != null) {
         const elapsedMs = Date.now() - startTime;
         const ratio = Math.min(elapsedMs / (duration * 1000), 1);
-        car.positionX = Math.round((car.positionX ?? 0) * ratio);
-        // также обновим position в status
+
+        const targetX = car.positionX ?? 0;
+        const currentX = Math.round(targetX * ratio);
+
+        car.positionX = currentX;
         if (typeof car.status === 'object') {
-          car.status.position = car.positionX;
+          car.status.position = currentX;
         }
       }
 

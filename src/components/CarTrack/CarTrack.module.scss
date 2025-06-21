@@ -1,0 +1,51 @@
+.carTrack {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1rem;
+}
+
+.topRow {
+  margin-bottom: 0.5rem;
+}
+
+.carId,
+.carName,
+.carStatus {
+  margin-right: 1rem;
+}
+
+.trackWrapper {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 80vw;
+  height: 60px;
+  position: relative;
+}
+
+.finishLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: red;
+  z-index: 1;
+}
+
+.carBox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 30px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.buttons {
+  margin-top: 0.5rem;
+}
+
+.startButton {
+  margin-left: 0.5rem;
+}

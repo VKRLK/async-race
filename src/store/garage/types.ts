@@ -2,9 +2,11 @@
 
 export type CarStatus = {
   status: 'stopped' | 'started' | 'drive';
+  isAnimating?: boolean;
   startTime?: number;
   finishTime?: number;
   position?: number;
+  hasFailed?: boolean;
 };
 
 export type CarType = {
