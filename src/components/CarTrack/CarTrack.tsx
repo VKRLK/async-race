@@ -113,65 +113,6 @@ const CarTrack = ({ car, trackWidth }: Props) => {
     el.style.left = `${car.positionX ?? 0}px`;
   }, [car.positionX, car.status?.status]);
 
-  // Car movement tracking
-  /* useEffect(() => {
-    let animationFrameId: number;
-    let hasFinished = false;
-
-    const trackPosition = () => {
-      const el = carRef.current;
-      if (!el) return;
-
-      const x = el.getBoundingClientRect().left;
-      dispatch(updateCarPosition({ id: car.id, position: x }));
-
-      if (car.status?.status) {
-        dispatch(
-          updateCarStatus({
-            id: car.id,
-            status: { ...car.status, position: x },
-          })
-        );
-      }
-
-      if (!hasFinished && car.status?.status === 'drive' && x >= finishLineXRef.current) {
-        hasFinished = true;
-
-        const finishTime = performance.timeOrigin + performance.now();
-        dispatch(setFinishTime({ id: car.id, finishTime }));
-
-        const start = startTimeRef.current;
-        if (start) {
-          const raceTime = finishTime - start;
-          dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
-        }
-
-        cancelAnimationFrame(animationFrameId);
-
-        dispatch(
-          updateCarStatus({
-            id: car.id,
-            status: {
-              ...car.status,
-              status: 'stopped',
-              finishTime,
-              position: x,
-            },
-          })
-        );
-        return;
-      }
-
-      animationFrameId = requestAnimationFrame(trackPosition);
-    };
-
-    if (car.status?.status === 'drive') {
-      animationFrameId = requestAnimationFrame(trackPosition);
-    }
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [car.id, car.status?.status, dispatch]); */
-
   // Reset car position on resetVersion change
   useEffect(() => {
     const el = carRef.current;

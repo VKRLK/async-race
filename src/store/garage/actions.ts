@@ -91,65 +91,6 @@ export const createRandomCars = createAsyncThunk<
   await dispatch(fetchCars({ page: currentPage }));
 });
 
-/* const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
-  try {
-    const { velocity, distance } = await startEngine(carId);
-    const startTime = performance.timeOrigin + performance.now();
-
-    dispatch(setStartTime({ id: carId, startTime }));
-    dispatch(
-      updateCarStatus({
-        id: carId,
-        status: {
-          status: 'drive',
-          startTime,
-        },
-      })
-    );
-
-    const targetX = trackWidth * 0.9;
-    const duration = distance / velocity / 1000;
-
-    dispatch(START_ANIMATION({ id: carId, targetX, duration }));
-
-    try {
-      const driveResult = await drive(carId);
-      if (!driveResult.success) throw new Error('Drive failed');
-
-      const finishTime = performance.timeOrigin + performance.now() - VISUAL_FRAME_OFFSET_MS;
-      const raceTime = finishTime - startTime;
-
-      dispatch(saveWinnerResult({ id: carId, time: raceTime }));
-    } catch {
-      // stop animation and reset position
-      const el = document.querySelector(`[data-car-id="${carId}"]`) as HTMLDivElement;
-      let left = 0;
-      if (el) {
-        const computed = window.getComputedStyle(el);
-        left = parseFloat(computed.left || '0');
-        el.style.transition = 'none';
-        el.style.left = `${left}px`;
-        // force rerender to apply the new position immediately
-        void el.offsetHeight;
-        requestAnimationFrame(() => {
-          el.style.left = `${left}px`;
-        });
-      }
-
-      dispatch(
-        updateCarStatus({
-          id: carId,
-          status: { status: 'stopped', position: left, hasFailed: true },
-        })
-      );
-
-      dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed', startTime, duration }));
-    }
-  } catch {
-    dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
-    dispatch(updateCarStatus({ id: carId, status: { status: 'stopped', hasFailed: true } }));
-  }
-}; */
 const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
   try {
     const { velocity, distance } = await startEngine(carId);
