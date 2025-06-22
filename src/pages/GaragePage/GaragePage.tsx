@@ -119,6 +119,7 @@ export function GaragePage() {
         onClick={() => navigate('/winners')}
         className={styles.navButton}
         hideTextOnMobile={false}
+        disabled={raceInProgress}
       />
 
       <RaceControlPanel paginatedCars={cars} trackWidth={trackWidth} />

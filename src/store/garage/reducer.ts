@@ -88,7 +88,9 @@ const garageSlice = createSlice({
         car.status = { status: 'stopped', position: 0 };
       });
     },
-
+    endRace(state) {
+      state.raceState.status = 'idle';
+    },
     START_ANIMATION(
       state,
       action: PayloadAction<{ id: number; targetX: number; duration: number }>
@@ -175,6 +177,7 @@ export const {
   setFinishTime,
   setCurrentPage,
   setFetchedCarsWithPersistence,
+  endRace,
 } = garageSlice.actions;
 
 export default garageSlice.reducer;

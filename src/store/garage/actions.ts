@@ -18,6 +18,7 @@ import {
   setCurrentPage,
   setStartTime,
   updateCarPosition,
+  endRace,
 } from './reducer';
 import { saveWinnerResult } from '../winners/actions';
 import type { CarType } from './types';
@@ -170,6 +171,7 @@ export const startRaceThunk = createAsyncThunk<
 >('garage/startRaceThunk', async ({ cars, trackWidth }, { dispatch }) => {
   dispatch(startRace());
   await Promise.all(cars.map(car => runSingleCarLogic(car.id, dispatch, trackWidth)));
+  dispatch(endRace());
 });
 
 export const resetRaceThunk = createAsyncThunk(
