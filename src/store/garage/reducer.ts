@@ -25,10 +25,12 @@ const garageSlice = createSlice({
     clearEditingCar(state) {
       state.editingCar = null;
     },
-
     updateCarPosition: (state, action: PayloadAction<{ id: number; position: number }>) => {
       const car = state.cars.find(c => c.id === action.payload.id);
-      if (car && typeof car.status === 'object') {
+      if (!car) return;
+      car.positionX = action.payload.position;
+
+      if (typeof car.status === 'object') {
         car.status.position = action.payload.position;
       }
     },

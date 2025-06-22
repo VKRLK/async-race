@@ -1,9 +1,9 @@
 // src/pages/GaragePage/GaragePage.tsx
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
-import { fetchCars } from '../../store/garage/actions';
+import { fetchCars, recalculatePixelPositionsOnResize } from '../../store/garage/actions';
 import { selectCars, selectCurrentPage, selectTotalCars } from '../../store/garage/selectors';
 import { CARS_PER_PAGE } from '../../utils/constants';
 import { setCurrentPage, setFetchedCarsWithPersistence } from '../../store/garage/reducer';
@@ -14,14 +14,15 @@ import CarEditor from '../../components/CarEditor/CarEditor';
 import Button from '../../components/Button/Button';
 import styles from './GaragePage.module.scss';
 import type { CarType } from '../../store/garage/types';
+import { useTrackResizeObserver } from '../../hooks/useTrackResizeObserver';
 
 export function GaragePage() {
   const dispatch = useAppDispatch();
   const cars = useAppSelector(selectCars);
   const total = useAppSelector(selectTotalCars);
   const page = useAppSelector(selectCurrentPage);
+  const raceInProgress = useAppSelector(state => state.garage.raceState.status === 'starting');
   const navigate = useNavigate();
-
   const trackContainerRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(800);
   const wasRestored = useRef(false);
@@ -43,6 +44,16 @@ export function GaragePage() {
     return () => observer.disconnect();
   }, []);
 
+  const handleResizeDone = useCallback(
+    (newWidth: number, oldWidth: number) => {
+      if (raceInProgress) return;
+      dispatch(recalculatePixelPositionsOnResize(oldWidth, newWidth));
+    },
+    [dispatch]
+  );
+
+  useTrackResizeObserver<HTMLDivElement>(trackContainerRef, handleResizeDone, 300);
+
   // Load saved page on mount
   useEffect(() => {
     const savedPage = Number(localStorage.getItem('garageCurrentPage'));
@@ -58,6 +69,8 @@ export function GaragePage() {
 
   // Fetch cars + restore state from localStorage
   useEffect(() => {
+    if (trackWidth <= 0) return;
+
     const pageKey = `carPositions_page_${page}`;
     const persistedCars = JSON.parse(localStorage.getItem(pageKey) || '[]');
 
@@ -79,7 +92,7 @@ export function GaragePage() {
       wasRestored.current = true;
       dispatch(setFetchedCarsWithPersistence(merged));
     });
-  }, [dispatch, page]);
+  }, [dispatch, page, trackWidth]);
 
   // Save car state on change
   useEffect(() => {
@@ -124,7 +137,7 @@ export function GaragePage() {
       <div ref={trackContainerRef} className={styles.trackContainer}>
         <ul className={styles.trackList}>
           {cars.map(car => (
-            <CarTrack key={car.id} car={car} trackWidth={trackWidth} />
+            <CarTrack key={`${car.id}-${trackWidth}`} car={car} trackWidth={trackWidth} />
           ))}
         </ul>
       </div>

@@ -17,10 +17,11 @@ import {
   resetRace,
   setCurrentPage,
   setStartTime,
+  updateCarPosition,
 } from './reducer';
 import { saveWinnerResult } from '../winners/actions';
 import type { CarType } from './types';
-import type { AppDispatch, RootState } from '../index';
+import type { AppDispatch, AppThunk, RootState } from '../index';
 import { CARS_PER_PAGE, VISUAL_FRAME_OFFSET_MS } from '../../utils/constants';
 import type { Car } from '../../api/types';
 import { generateRandomCarName, generateRandomColor } from '../../utils/helpers';
@@ -90,7 +91,7 @@ export const createRandomCars = createAsyncThunk<
   await dispatch(fetchCars({ page: currentPage }));
 });
 
-const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
+/* const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
   try {
     const { velocity, distance } = await startEngine(carId);
     const startTime = performance.timeOrigin + performance.now();
@@ -148,6 +149,69 @@ const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidt
     dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
     dispatch(updateCarStatus({ id: carId, status: { status: 'stopped', hasFailed: true } }));
   }
+}; */
+const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidth: number) => {
+  try {
+    const { velocity, distance } = await startEngine(carId);
+    const startTime = performance.timeOrigin + performance.now();
+
+    dispatch(setStartTime({ id: carId, startTime }));
+    dispatch(
+      updateCarStatus({
+        id: carId,
+        status: {
+          status: 'drive',
+          startTime,
+        },
+      })
+    );
+
+    const targetX = trackWidth * 0.9;
+    const duration = distance / velocity / 1000;
+
+    dispatch(START_ANIMATION({ id: carId, targetX, duration }));
+
+    try {
+      const driveResult = await drive(carId);
+      if (!driveResult.success) throw new Error('Drive failed');
+
+      const finishTime = performance.timeOrigin + performance.now() - VISUAL_FRAME_OFFSET_MS;
+      const raceTime = finishTime - startTime;
+
+      dispatch(saveWinnerResult({ id: carId, time: raceTime }));
+    } catch {
+      // 🛑 Получен сбой — остановить анимацию строго по текущей позиции DOM
+      const el = document.querySelector(`[data-car-id="${carId}"]`) as HTMLDivElement;
+      let left = 0;
+
+      if (el) {
+        const computed = window.getComputedStyle(el);
+        left = parseFloat(computed.left || '0');
+        el.style.transition = 'none';
+        el.style.left = `${left}px`;
+        void el.offsetHeight;
+      }
+      dispatch(updateCarPosition({ id: carId, position: left }));
+
+      dispatch(
+        updateCarStatus({
+          id: carId,
+          status: {
+            status: 'stopped',
+            position: left,
+            hasFailed: true,
+          },
+        })
+      );
+
+      // 💣 Отменить любые расчёты и анимацию
+      dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed' }));
+    }
+  } catch {
+    // 🛑 Непредвиденная ошибка — остановить и пометить как сломанную
+    dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
+    dispatch(updateCarStatus({ id: carId, status: { status: 'stopped', hasFailed: true } }));
+  }
 };
 
 export const startSingleCarThunk = createAsyncThunk<
@@ -199,3 +263,16 @@ export const resetRaceThunk = createAsyncThunk(
     dispatch(resetRace());
   }
 );
+
+export const recalculatePixelPositionsOnResize =
+  (oldWidth: number, newWidth: number): AppThunk =>
+  (dispatch, getState) => {
+    const scale = newWidth / oldWidth;
+    const cars = getState().garage.cars;
+
+    cars.forEach(car => {
+      const oldX = car.positionX ?? 0;
+      const newX = oldX * scale;
+      dispatch(updateCarPosition({ id: car.id, position: newX }));
+    });
+  };

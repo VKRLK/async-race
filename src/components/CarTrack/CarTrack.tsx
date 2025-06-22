@@ -1,21 +1,19 @@
-// src/components/CarTrack/CarTrack.tsx
+//src\components\CarTrack\CarTrack.tsx
 
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../store/hooks';
 
 import type { RootState } from '../../store';
-import { startSingleCarThunk } from '../../store/garage/actions';
 import type { CarType } from '../../store/garage/types';
+import { startSingleCarThunk } from '../../store/garage/actions';
 import { updateCarPosition, updateCarStatus } from '../../store/garage/reducer';
 import { selectResetVersion } from '../../store/garage/selectors';
 import { setFinishTime } from '../../store/winners/reducer';
 import { stopEngine } from '../../api/api';
 import { saveWinnerResult } from '../../store/winners/actions';
-
-import CarTrackControls from './CarTrackControls';
 import { useCarMovement } from './useCarMovement';
-
+import CarTrackControls from './CarTrackControls';
 import styles from './CarTrack.module.scss';
 
 type Props = {
@@ -26,20 +24,49 @@ type Props = {
 const CarTrack = ({ car, trackWidth }: Props) => {
   const dispatch = useAppDispatch();
   const carRef = useRef<HTMLDivElement>(null);
-  const finishLineOffset = trackWidth * 0.9;
+  const finishLineRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<number | undefined>(car.status?.startTime);
   const finishLineXRef = useRef<number>(0);
   const resetVersion = useSelector(selectResetVersion);
   const [elapsed, setElapsed] = useState(0);
   const winner = useSelector((state: RootState) => state.winners.winner[car.id]);
+  const hasFinishedRef = useRef(false);
 
-  // Анимация движения
-  useCarMovement(car, carRef);
+  useCarMovement(car, carRef, {
+    onFinish: id => {
+      if (hasFinishedRef.current || car.status?.status !== 'drive') return;
 
+      hasFinishedRef.current = true;
+
+      const finishTime =
+        car.status?.startTime && car.duration
+          ? car.status.startTime + car.duration * 1000
+          : performance.timeOrigin + performance.now();
+
+      dispatch(setFinishTime({ id: car.id, finishTime }));
+
+      if (car.status?.startTime) {
+        const raceTime = finishTime - car.status.startTime;
+        dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
+      }
+
+      dispatch(
+        updateCarStatus({
+          id: car.id,
+          status: {
+            ...car.status,
+            status: 'stopped',
+            finishTime,
+            position: car.positionX ?? 0,
+          },
+        })
+      );
+    },
+  });
+
+  // Time tracking for the car
   useEffect(() => {
-    if (car.status?.status !== 'drive' || !car.duration) {
-      return;
-    }
+    if (car.status?.status !== 'drive' || !car.duration) return;
 
     const start = performance.now();
 
@@ -60,32 +87,34 @@ const CarTrack = ({ car, trackWidth }: Props) => {
     };
 
     requestAnimationFrame(tick);
-
     return () => setElapsed(0);
   }, [car.status?.status, car.duration]);
 
-  // Finish line position
+  // Finish line update after track width change
   useEffect(() => {
-    if (carRef.current) {
-      const parentLeft = carRef.current.parentElement?.getBoundingClientRect().left ?? 0;
-      finishLineXRef.current = parentLeft + finishLineOffset;
+    const finishEl = finishLineRef.current;
+    if (finishEl) {
+      const offset = trackWidth * 0.9;
+      finishEl.style.left = `${offset}px`;
+      finishLineXRef.current = finishEl.getBoundingClientRect().left;
     }
-  }, [finishLineOffset]);
+  }, [trackWidth]);
 
-  // Set initial start time when car status changes
+  // Save start time
   useEffect(() => {
     startTimeRef.current = car.status?.startTime;
   }, [car.status?.startTime]);
 
-  // Reset car position when status changes
+  // Car position update on status change
   useEffect(() => {
     const el = carRef.current;
-    if (!el || car.status?.status === 'drive') return;
+    if (!el) return;
+    el.style.transition = 'left 0.1s';
     el.style.left = `${car.positionX ?? 0}px`;
   }, [car.positionX, car.status?.status]);
 
-  // Finish line tracking and status updates
-  useEffect(() => {
+  // Car movement tracking
+  /* useEffect(() => {
     let animationFrameId: number;
     let hasFinished = false;
 
@@ -100,18 +129,14 @@ const CarTrack = ({ car, trackWidth }: Props) => {
         dispatch(
           updateCarStatus({
             id: car.id,
-            status: {
-              status: car.status.status,
-              position: x,
-              startTime: car.status.startTime,
-              finishTime: car.status.finishTime,
-            },
+            status: { ...car.status, position: x },
           })
         );
       }
 
       if (!hasFinished && car.status?.status === 'drive' && x >= finishLineXRef.current) {
         hasFinished = true;
+
         const finishTime = performance.timeOrigin + performance.now();
         dispatch(setFinishTime({ id: car.id, finishTime }));
 
@@ -120,6 +145,21 @@ const CarTrack = ({ car, trackWidth }: Props) => {
           const raceTime = finishTime - start;
           dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
         }
+
+        cancelAnimationFrame(animationFrameId);
+
+        dispatch(
+          updateCarStatus({
+            id: car.id,
+            status: {
+              ...car.status,
+              status: 'stopped',
+              finishTime,
+              position: x,
+            },
+          })
+        );
+        return;
       }
 
       animationFrameId = requestAnimationFrame(trackPosition);
@@ -130,13 +170,12 @@ const CarTrack = ({ car, trackWidth }: Props) => {
     }
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [car.id, car.status?.status, dispatch]);
+  }, [car.id, car.status?.status, dispatch]); */
 
-  // Reset car position when resetVersion changes
+  // Reset car position on resetVersion change
   useEffect(() => {
     const el = carRef.current;
     if (!el) return;
-
     el.style.transition = 'none';
     el.style.left = '0px';
   }, [resetVersion]);
@@ -186,7 +225,8 @@ const CarTrack = ({ car, trackWidth }: Props) => {
       ) : null}
 
       <div className={styles.trackWrapper}>
-        <div className={styles.finishLine} style={{ left: `${finishLineOffset}px` }} />
+        <div ref={finishLineRef} className={styles.finishLine} />
+
         <div
           ref={carRef}
           className={styles.carBox}

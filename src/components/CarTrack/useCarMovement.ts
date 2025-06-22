@@ -1,11 +1,16 @@
-// src\components\CarTrack\useCarMovement.ts
+//src\components\CarTrack\useCarMovement.ts
 
 import { useEffect, useRef } from 'react';
 import type { CarType } from '../../store/garage/types';
 
+type UseCarMovementOptions = {
+  onFinish?: (carId: number) => void;
+};
+
 export const useCarMovement = (
   car: Pick<CarType, 'id' | 'positionX' | 'status' | 'duration'>,
-  carRef: React.RefObject<HTMLDivElement | null>
+  carRef: React.RefObject<HTMLDivElement | null>,
+  options?: UseCarMovementOptions
 ) => {
   const animationFrameRef = useRef<number | null>(null);
 
@@ -13,13 +18,11 @@ export const useCarMovement = (
     const el = carRef.current;
     if (!el) return;
 
-    // reset animation frame if it exists
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
 
-    // if the car is not driving, just set the position
     if (car.status?.status !== 'drive') {
       el.style.left = `${car.positionX ?? 0}px`;
       return;
@@ -39,13 +42,22 @@ export const useCarMovement = (
 
       if (progress < 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        el.style.left = `${targetX}px`;
+
+        // ✅ Точный момент завершения движения
+        if (options?.onFinish) {
+          options.onFinish(car.id);
+        }
       }
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, [car.id, car.positionX, car.duration, car.status?.status]);
 };
