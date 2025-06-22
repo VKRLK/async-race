@@ -161,6 +161,10 @@ const CarTrack = ({ car, trackWidth }: Props) => {
         <span style={{ color: car.color }}>
           {((winner.finishTime - winner.startTime) / 1000).toFixed(2)} sec
         </span>
+      ) : car.status?.finishTime && car.status?.startTime ? (
+        <span style={{ color: car.color }}>
+          {((car.status.finishTime - car.status.startTime) / 1000).toFixed(2)} sec
+        </span>
       ) : car.status?.status === 'drive' && car.duration !== undefined ? (
         <span style={{ color: car.color }}>{elapsed.toFixed(2)} sec</span>
       ) : null}
