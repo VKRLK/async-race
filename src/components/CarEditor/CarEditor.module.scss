@@ -1,0 +1,37 @@
+/* src/components/CarEditor/CarEditor.module.scss */
+
+.carEditor {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg);
+  color: var(--text);
+  min-width: 160px;
+
+  &:focus {
+    outline: 2px solid var(--primary);
+    border-color: var(--primary);
+  }
+}
+
+.colorPicker {
+  width: 50px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.cancelButton {
+  margin-left: 0.5rem;
+}

@@ -17,7 +17,7 @@
 .trackWrapper {
   display: flex;
   align-items: center;
-  overflow: hidden;
+  /* overflow: hidden; */
   width: 80vw;
   height: 60px;
   position: relative;
@@ -27,9 +27,9 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 40px;
   background: red;
-  z-index: 1;
+  z-index: 4;
 }
 
 .carBox {

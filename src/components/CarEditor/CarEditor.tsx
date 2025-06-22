@@ -1,9 +1,10 @@
 // src/components/CarEditor/CarEditor.tsx
 
 import { useState, useEffect } from 'react';
-
 import { useAppDispatch } from '../../store/hooks';
 import { createCar, updateCar } from '../../store/garage/actions';
+import Button from '../Button/Button';
+import styles from './CarEditor.module.scss';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -42,11 +43,33 @@ const CarEditor = ({
   };
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Car name" />
-      <input type="color" value={color} onChange={e => setColor(e.target.value)} />
-      <button onClick={handleSubmit}>{mode === 'edit' ? 'Finish' : 'Create'}</button>
-      {mode === 'edit' && onCancelEdit && <button onClick={onCancelEdit}>Cancel</button>}
+    <div className={styles.carEditor}>
+      <input
+        className={styles.input}
+        value={name}
+        onChange={e => setName(e.target.value)}
+        placeholder="Car name"
+      />
+      <input
+        type="color"
+        className={styles.colorPicker}
+        value={color}
+        onChange={e => setColor(e.target.value)}
+      />
+      <Button
+        text={mode === 'edit' ? 'Finish' : 'Create'}
+        onClick={handleSubmit}
+        variant="primary"
+      />
+      {mode === 'edit' && onCancelEdit && (
+        <Button
+          text="Cancel"
+          onClick={onCancelEdit}
+          variant="danger"
+          appearance="outline"
+          className={styles.cancelButton}
+        />
+      )}
     </div>
   );
 };

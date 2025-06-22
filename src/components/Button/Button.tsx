@@ -12,7 +12,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   backgroundColor?: string;
   borderColor?: string;
-  hideTextOnMobile?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,7 +23,6 @@ const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   appearance = 'filled',
   color,
-  hideTextOnMobile,
   backgroundColor,
   borderColor,
   ...props
@@ -56,7 +54,7 @@ const Button: React.FC<ButtonProps> = ({
           {icon}
         </span>
       )}
-      {!hideTextOnMobile && text && (
+      {text && (
         <span className={styles.text} style={{ color }}>
           {text}
         </span>

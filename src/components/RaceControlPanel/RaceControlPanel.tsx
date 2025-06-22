@@ -1,9 +1,11 @@
-//src\components\RaceControlPanel\RaceControlPanel.tsx
+// src/components/RaceControlPanel/RaceControlPanel.tsx
 
 import { useAppDispatch } from '../../store/hooks';
 import { createRandomCars, startRaceThunk, resetRaceThunk } from '../../store/garage/actions';
 import type { CarType } from '../../store/garage/types';
 import { useState } from 'react';
+import Button from '../Button/Button';
+import styles from './RaceControlPanel.module.scss';
 
 type Props = {
   paginatedCars: CarType[];
@@ -40,18 +42,25 @@ const RaceControlPanel = ({ paginatedCars, trackWidth }: Props) => {
   };
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-      <div style={{ marginBottom: '1rem' }}>
-        <button onClick={handleStartAll} disabled={isRaceInProgress || paginatedCars.length === 0}>
-          {isRaceInProgress ? 'Running...' : 'Start All'}
-        </button>
-        <button onClick={handleResetAll} disabled={isRaceInProgress || paginatedCars.length === 0}>
-          Reset All
-        </button>
-        <button onClick={handleGenerate} disabled={isRaceInProgress}>
-          Generate 100 Cars
-        </button>
-      </div>
+    <div className={styles.panel}>
+      <Button
+        text={isRaceInProgress ? 'Running...' : 'Start All'}
+        onClick={handleStartAll}
+        disabled={isRaceInProgress || paginatedCars.length === 0}
+      />
+      <Button
+        text="Reset All"
+        onClick={handleResetAll}
+        disabled={isRaceInProgress || paginatedCars.length === 0}
+        appearance="outline"
+      />
+      <Button
+        text="Generate 100 Cars"
+        onClick={handleGenerate}
+        disabled={isRaceInProgress}
+        variant="primary"
+        appearance="outline"
+      />
     </div>
   );
 };

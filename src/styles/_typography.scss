@@ -1,0 +1,27 @@
+// Body text (14px, regular)
+@mixin bodyText {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 150%;
+	letter-spacing: 0;
+	vertical-align: middle;
+}
+
+// Title text (25px, bold)
+@mixin titleText {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 700;
+	font-size: 25px;
+	line-height: 120%;
+	letter-spacing: 0;
+	vertical-align: middle;
+}
+
+// Subtitle or section heading (optional)
+@mixin sectionTitle {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 18px;
+	line-height: 140%;
+}

@@ -1,0 +1,94 @@
+/* src/components/Button/Button.module.scss */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+}
+
+.text {
+  white-space: nowrap;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
+}
+
+/* === Variants === */
+.btn--primary {
+  --btn-color: var(--bg);
+  --btn-bg: var(--primary);
+  --btn-border: var(--primary);
+
+  &.filled {
+    background-color: var(--btn-bg);
+    color: var(--btn-color);
+    border-color: var(--btn-border);
+
+    &:hover {
+      background-color: var(--primary-hover);
+    }
+  }
+
+  &.outline {
+    background-color: transparent;
+    color: var(--primary);
+    border-color: var(--primary);
+
+    &:hover {
+      background-color: rgba(38, 193, 126, 0.1); // semi-transparent hover
+    }
+  }
+}
+
+.btn--danger {
+  --btn-color: var(--bg);
+  --btn-bg: var(--error);
+  --btn-border: var(--error);
+
+  &.filled {
+    background-color: var(--btn-bg);
+    color: var(--btn-color);
+    border-color: var(--btn-border);
+
+    &:hover {
+      background-color: var(--error-hover);
+    }
+  }
+
+  &.outline {
+    background-color: transparent;
+    color: var(--error);
+    border-color: var(--error);
+
+    &:hover {
+      background-color: rgba(203, 0, 0, 0.1);
+    }
+  }
+}

@@ -1,0 +1,27 @@
+/* Default Theme (System / Light fallback) */
+:root {
+  --bg: #f5e9d3; // песочно-теплый, не яркий
+  --text: #2a2a2a;
+  --primary: #f4a300; // насыщенный солнечный акцент
+  --primary-hover: #d88f00;
+  --secondary: #fff5e5; // для карточек/элементов
+  --border: #e0c9a0;
+  --error: #b94a48;
+  --error-hover: #8a2c29;
+  --track-bg: #c0b8ae; // светлый, теплый асфальт
+  --track-line: #9e9387;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --bg: #2b2e48; // мягкий, как небо после заката
+  --text: #e4e7ec;
+  --primary: #738ffe; // синий-фиолетовый акцент
+  --primary-hover: #5a73d7;
+  --secondary: #373a59; // карточки/фоновые блоки
+  --border: #4c4f6c;
+  --error: #ff7676;
+  --error-hover: #cc4c4c;
+  --track-bg: #3a3d4d; // тёмный асфальт, ближе к фиолетовому
+  --track-line: #5c5f72;
+}

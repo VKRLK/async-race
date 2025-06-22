@@ -118,7 +118,6 @@ export function GaragePage() {
         text="Winners"
         onClick={() => navigate('/winners')}
         className={styles.navButton}
-        hideTextOnMobile={false}
         disabled={raceInProgress}
       />
 
