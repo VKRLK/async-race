@@ -45,7 +45,11 @@ const Button: React.FC<ButtonProps> = ({
       onClick={handleClick}
       {...props}
     >
-      {icon && <span className={styles.iconWrapper}>{icon}</span>}
+      {icon && (
+        <span className={styles.iconWrapper} style={{ color }}>
+          {icon}
+        </span>
+      )}
       {text && <span className={classNames(styles.text, textClassName)}>{text}</span>}
     </button>
   );

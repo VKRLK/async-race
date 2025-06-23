@@ -15,6 +15,8 @@ import { saveWinnerResult } from '../../store/winners/actions';
 import { useCarMovement } from './useCarMovement';
 import CarTrackControls from './CarTrackControls';
 import styles from './CarTrack.module.scss';
+import Button from '../Button/Button';
+import CarSvg from '../CarSvg/CarSvg';
 
 type Props = {
   car: CarType;
@@ -33,7 +35,7 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   const hasFinishedRef = useRef(false);
 
   useCarMovement(car, carRef, {
-    onFinish: id => {
+    onFinish: () => {
       if (hasFinishedRef.current || car.status?.status !== 'drive') return;
 
       hasFinishedRef.current = true;
@@ -147,48 +149,42 @@ const CarTrack = ({ car, trackWidth }: Props) => {
 
   return (
     <li className={styles.carTrack}>
-      <div className={styles.topRow}>
-        <CarTrackControls car={car} />
+      <div className={styles.trackHeader}>
+        <div>
+          <CarTrackControls car={car} />
+        </div>
+
+        <div className={styles.statusOrTime}>
+          {car.status?.hasFailed ? (
+            <span style={{ color: 'red' }}>Engine failure</span>
+          ) : winner?.startTime && winner?.finishTime ? (
+            <span style={{ color: car.color }}>
+              {((winner.finishTime - winner.startTime) / 1000).toFixed(2)} sec
+            </span>
+          ) : car.status?.finishTime && car.status?.startTime ? (
+            <span style={{ color: car.color }}>
+              {((car.status.finishTime - car.status.startTime) / 1000).toFixed(2)} sec
+            </span>
+          ) : car.status?.status === 'drive' && car.duration !== undefined ? (
+            <span style={{ color: car.color }}>{elapsed.toFixed(2)} sec</span>
+          ) : null}
+        </div>
       </div>
 
-      <span className={styles.carStatus} style={{ color: car.color }}>
-        ({car.status?.status})
-      </span>
+      <div className={styles.secondLine}>
+        <div className={styles.buttonWrapper}>
+          <Button text="Start" onClick={() => handleStart()} className={styles.startButton} />
+          <Button text="Reset" onClick={() => handleReset()} className={styles.resetButton} />
+        </div>
 
-      {car.status?.hasFailed ? (
-        <span style={{ color: 'red' }}>Engine failure</span>
-      ) : winner?.startTime && winner?.finishTime ? (
-        <span style={{ color: car.color }}>
-          {((winner.finishTime - winner.startTime) / 1000).toFixed(2)} sec
-        </span>
-      ) : car.status?.finishTime && car.status?.startTime ? (
-        <span style={{ color: car.color }}>
-          {((car.status.finishTime - car.status.startTime) / 1000).toFixed(2)} sec
-        </span>
-      ) : car.status?.status === 'drive' && car.duration !== undefined ? (
-        <span style={{ color: car.color }}>{elapsed.toFixed(2)} sec</span>
-      ) : null}
+        <div className={styles.trackWrapper}>
+          <div className={styles.roadLine} />
+          <div ref={finishLineRef} className={styles.finishLine} />
 
-      <div className={styles.trackWrapper}>
-        <div ref={finishLineRef} className={styles.finishLine} />
-
-        <div
-          ref={carRef}
-          className={styles.carBox}
-          style={{ backgroundColor: car.color }}
-          data-car-id={car.id}
-        />
-      </div>
-
-      <div className={styles.buttons}>
-        <button onClick={handleReset}>Reset</button>
-        <button
-          onClick={handleStart}
-          disabled={car.status?.status !== 'stopped'}
-          className={styles.startButton}
-        >
-          Start
-        </button>
+          <div ref={carRef} className={styles.carBox} data-car-id={car.id}>
+            <CarSvg color={car.color} />
+          </div>
+        </div>
       </div>
     </li>
   );

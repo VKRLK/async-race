@@ -57,7 +57,7 @@ const CarEditor = ({
         onChange={e => setColor(e.target.value)}
       />
       <Button
-        text={mode === 'edit' ? 'Finish' : 'Create'}
+        text={mode === 'edit' ? 'Finish' : 'Add New Car'}
         onClick={handleSubmit}
         variant="primary"
       />

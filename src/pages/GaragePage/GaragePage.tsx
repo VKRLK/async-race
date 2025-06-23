@@ -35,7 +35,7 @@ export function GaragePage() {
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
         if (entry.contentRect.width) {
-          setTrackWidth(entry.contentRect.width);
+          setTrackWidth(entry.contentRect.width * 0.9);
         }
       }
     });
