@@ -122,7 +122,6 @@ const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidt
 
       dispatch(saveWinnerResult({ id: carId, time: raceTime }));
     } catch {
-      // 🛑 Получен сбой — остановить анимацию строго по текущей позиции DOM
       const el = document.querySelector(`[data-car-id="${carId}"]`) as HTMLDivElement;
       let left = 0;
 
@@ -146,11 +145,9 @@ const runSingleCarLogic = async (carId: number, dispatch: AppDispatch, trackWidt
         })
       );
 
-      // 💣 Отменить любые расчёты и анимацию
       dispatch(STOP_ANIMATION({ id: carId, error: 'Drive failed' }));
     }
   } catch {
-    // 🛑 Непредвиденная ошибка — остановить и пометить как сломанную
     dispatch(STOP_ANIMATION({ id: carId, error: 'Unexpected error' }));
     dispatch(updateCarStatus({ id: carId, status: { status: 'stopped', hasFailed: true } }));
   }
