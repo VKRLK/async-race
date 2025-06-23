@@ -58,6 +58,10 @@
     position: relative;
     gap: 0.5rem;
 
+    @media (max-width: 500px) {
+      width: 15vw;
+    }
+
     .startButton {
       padding: 0.2rem 0.5rem;
       width: 80%;

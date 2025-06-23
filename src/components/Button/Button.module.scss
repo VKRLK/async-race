@@ -38,7 +38,7 @@
 .text {
   white-space: nowrap;
   color: var(--btn-color);
-  @media (max-width: 500px) {
+  /* @media (max-width: 500px) {
     display: none;
-  }
+  } */
 }
