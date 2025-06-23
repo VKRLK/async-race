@@ -126,11 +126,6 @@ export function GaragePage() {
       <CarEditor mode="create" />
 
       <div ref={trackContainerRef} className={styles.trackContainer}>
-        {/* <ul className={styles.trackList}>
-          {cars.map(car => (
-            <CarTrack key={`${car.id}-${trackWidth}`} car={car} trackWidth={trackWidth} />
-          ))}
-        </ul> */}
         {cars.length === 0 ? (
           <div className={styles.garageEmptyPlaceholder}>
             No cars in the garage. Create one to get started!
