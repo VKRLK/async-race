@@ -45,11 +45,21 @@ export const saveWinnerResult = createAsyncThunk<void, { id: number; time: numbe
     const existing = await getWinner(id);
 
     if (existing) {
-      const bestTime = existing.time < 100 ? time : Math.min(existing.time, time);
-
-      await updateWinner(id, existing.wins + 1, bestTime);
+      const existingTime = existing.time < 100 ? Infinity : existing.time;
+      const bestTime = Math.min(existingTime, time);
+      await updateWinner(id, existing.wins, bestTime);
     } else {
       await createWinner(id, time);
+    }
+  }
+);
+
+export const incrementWinFor = createAsyncThunk<void, number>(
+  'winners/incrementWinFor',
+  async id => {
+    const existing = await getWinner(id);
+    if (existing) {
+      await updateWinner(id, existing.wins + 1, existing.time);
     }
   }
 );

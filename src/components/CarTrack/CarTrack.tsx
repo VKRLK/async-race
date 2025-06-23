@@ -18,12 +18,18 @@ import styles from './CarTrack.module.scss';
 import Button from '../Button/Button';
 import CarSvg from '../CarSvg/CarSvg';
 
+export type FastestRef = React.MutableRefObject<{
+  id: number;
+  time: number;
+} | null>;
+
 type Props = {
   car: CarType;
   trackWidth: number;
+  fastestFinishRef: FastestRef;
 };
 
-const CarTrack = ({ car, trackWidth }: Props) => {
+const CarTrack = ({ car, trackWidth, fastestFinishRef }: Props) => {
   const dispatch = useAppDispatch();
   const carRef = useRef<HTMLDivElement>(null);
   const finishLineRef = useRef<HTMLDivElement>(null);
@@ -38,20 +44,23 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   useCarMovement(car, carRef, {
     onFinish: () => {
       if (hasFinishedRef.current || car.status?.status !== 'drive') return;
-
       hasFinishedRef.current = true;
 
-      const finishTime =
-        car.status?.startTime && car.duration
-          ? car.status.startTime + car.duration * 1000
-          : performance.timeOrigin + performance.now();
+      const finishTime = car.status.startTime! + car.duration! * 1000;
+      const raceTime = finishTime - car.status.startTime!;
 
       dispatch(setFinishTime({ id: car.id, finishTime }));
 
-      if (car.status?.startTime) {
-        const raceTime = finishTime - car.status.startTime;
-        dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
+      // 📌 Save fastest car ID
+      if (!fastestFinishRef.current || raceTime < fastestFinishRef.current.time) {
+        fastestFinishRef.current = {
+          id: car.id,
+          time: raceTime,
+        };
       }
+
+      // Save finish result for all
+      dispatch(saveWinnerResult({ id: car.id, time: raceTime }));
 
       dispatch(
         updateCarStatus({

@@ -103,7 +103,7 @@ export async function createWinner(id: number, time: number): Promise<Winner> {
   return request<Winner>(`${BACKEND_URL}/winners`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, wins: 1, time }),
+    body: JSON.stringify({ id, wins: 0, time }),
   });
 }
 

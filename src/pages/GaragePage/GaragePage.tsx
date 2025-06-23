@@ -15,6 +15,7 @@ import Button from '../../components/Button/Button';
 import styles from './GaragePage.module.scss';
 import type { CarType } from '../../store/garage/types';
 import { useTrackResizeObserver } from '../../hooks/useTrackResizeObserver';
+import { incrementWinFor } from '../../store/winners/actions';
 
 export function GaragePage() {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ export function GaragePage() {
   const trackContainerRef = useRef<HTMLDivElement>(null);
   const [trackWidth, setTrackWidth] = useState(800);
   const wasRestored = useRef(false);
+  const fastestFinishRef = useRef<{ id: number; time: number } | null>(null);
 
   // Track width observer
   useEffect(() => {
@@ -61,6 +63,13 @@ export function GaragePage() {
       dispatch(setCurrentPage(savedPage));
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!raceInProgress && fastestFinishRef.current) {
+      dispatch(incrementWinFor(fastestFinishRef.current.id));
+      fastestFinishRef.current = null;
+    }
+  }, [raceInProgress, dispatch]);
 
   // Save current page number
   useEffect(() => {
@@ -133,7 +142,12 @@ export function GaragePage() {
         ) : (
           <ul className={styles.trackList}>
             {cars.map(car => (
-              <CarTrack key={`${car.id}-${trackWidth}`} car={car} trackWidth={trackWidth} />
+              <CarTrack
+                key={`${car.id}-${trackWidth}`}
+                car={car}
+                trackWidth={trackWidth}
+                fastestFinishRef={fastestFinishRef}
+              />
             ))}
           </ul>
         )}
