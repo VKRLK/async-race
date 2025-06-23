@@ -40,11 +40,11 @@ const WinnerPage: React.FC = () => {
     dispatch(fetchWinners({ page, limit: WINNERS_PER_PAGE, sort: sortField, order: sortOrder }));
   }, [dispatch, page, sortField, sortOrder]);
 
-  const handlePrev = () => {
+  const handlePrevPage = () => {
     if (page > 1) dispatch(setCurrentPage(page - 1));
   };
 
-  const handleNext = () => {
+  const handleNextPage = () => {
     if (winners.length === WINNERS_PER_PAGE) {
       dispatch(setCurrentPage(page + 1));
     }
@@ -64,7 +64,7 @@ const WinnerPage: React.FC = () => {
 
   return (
     <div className={styles.winnerPage}>
-      <h1>Winners</h1>
+      <div className={styles.title}>Winners</div>
       <Button
         text="Garage"
         onClick={() => navigate('/garage')}
@@ -73,57 +73,62 @@ const WinnerPage: React.FC = () => {
       />
 
       {winners.length === 0 ? (
-        <p>No winners yet.</p>
+        <div className={styles.noWinners}>
+          <p>No winners on this garage page yet.</p>
+        </div>
       ) : (
         <>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>№</th>
-                <th>Car</th>
-                <th>Name</th>
-                <th onClick={() => handleSort('wins')} style={{ cursor: 'pointer' }}>
-                  Wins {sortField === 'wins' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                </th>
-                <th onClick={() => handleSort('time')} style={{ cursor: 'pointer' }}>
-                  Best Time (s) {sortField === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {winners.map((winner: WinnerDisplay, index: number) => (
-                <tr key={winner.id}>
-                  <td>{(page - 1) * WINNERS_PER_PAGE + index + 1}</td>
-                  <td>
-                    <div
-                      style={{
-                        width: '30px',
-                        height: '16px',
-                        backgroundColor: winner.color,
-                        borderRadius: '4px',
-                        margin: '0 auto',
-                      }}
-                    />
-                  </td>
-                  <td>{winner.name}</td>
-                  <td>{winner.wins}</td>
-                  <td>{winner.time >= 999999 ? '—' : (winner.time / 1000).toFixed(2)}</td>
+          <div className={styles.tableContainer}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Car</th>
+                  <th>Name</th>
+                  <th onClick={() => handleSort('wins')} style={{ cursor: 'pointer' }}>
+                    Wins {sortField === 'wins' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                  </th>
+                  <th onClick={() => handleSort('time')} style={{ cursor: 'pointer' }}>
+                    Best Time (s) {sortField === 'time' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {winners.map((winner: WinnerDisplay, index: number) => (
+                  <tr key={winner.id}>
+                    <td>{(page - 1) * WINNERS_PER_PAGE + index + 1}</td>
+                    <td>
+                      <div
+                        style={{
+                          width: '30px',
+                          height: '16px',
+                          backgroundColor: winner.color,
+                          borderRadius: '4px',
+                          margin: '0 auto',
+                        }}
+                      />
+                    </td>
+                    <td>{winner.name}</td>
+                    <td>{winner.wins}</td>
+                    <td>{winner.time >= 999999 ? '—' : (winner.time / 1000).toFixed(2)}</td>
+                  </tr>
+                ))}
 
-          <div className={styles.pagination}>
-            <button onClick={handlePrev} disabled={page === 1}>
-              Prev
-            </button>
-            <span>Page {page}</span>
-            <button onClick={handleNext} disabled={winners.length < WINNERS_PER_PAGE}>
-              Next
-            </button>
+                {Array.from({ length: WINNERS_PER_PAGE - winners.length }).map((_, i) => (
+                  <tr key={`empty-${i}`} className={styles.emptyRow}>
+                    <td colSpan={5}></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </>
       )}
+      <div className={styles.pagination}>
+        <Button text="Prev" onClick={handlePrevPage} disabled={page === 1} />
+        <span>Page {page}</span>
+        <Button text="Next" onClick={handleNextPage} disabled={winners.length < WINNERS_PER_PAGE} />
+      </div>
     </div>
   );
 };

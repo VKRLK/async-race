@@ -9,8 +9,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: large;
   @include titleText;
+  margin: 1rem;
 }
 
 .winnersButton {
