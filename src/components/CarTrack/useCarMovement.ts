@@ -45,7 +45,6 @@ export const useCarMovement = (
       } else {
         el.style.left = `${targetX}px`;
 
-        // ✅ Точный момент завершения движения
         if (options?.onFinish) {
           options.onFinish(car.id);
         }

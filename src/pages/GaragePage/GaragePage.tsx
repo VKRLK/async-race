@@ -140,12 +140,16 @@ export function GaragePage() {
       </div>
 
       <div className={styles.pagination}>
-        <Button text="Prev" onClick={() => handlePrevPage()} disabled={page === 1} />
+        <Button
+          text="Prev"
+          onClick={() => handlePrevPage()}
+          disabled={raceInProgress || page === 1}
+        />
         <span> {page} </span>
         <Button
           text="Next"
           onClick={() => handleNextPage()}
-          disabled={page * CARS_PER_PAGE >= total}
+          disabled={raceInProgress || page * CARS_PER_PAGE >= total}
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
 // src/components/CarEditor/CarEditor.tsx
 
 import { useState, useEffect } from 'react';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createCar, updateCar } from '../../store/garage/actions';
 import Button from '../Button/Button';
 import styles from './CarEditor.module.scss';
@@ -24,6 +24,7 @@ const CarEditor = ({
   const dispatch = useAppDispatch();
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
+  const raceInProgress = useAppSelector(state => state.garage.raceState.status === 'starting');
 
   useEffect(() => {
     setName(initialName);
@@ -60,6 +61,7 @@ const CarEditor = ({
         text={mode === 'edit' ? 'Finish' : 'Add New Car'}
         onClick={handleSubmit}
         variant="primary"
+        disabled={raceInProgress}
       />
       {mode === 'edit' && onCancelEdit && (
         <Button

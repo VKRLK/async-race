@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import type { RootState } from '../../store';
 import type { CarType } from '../../store/garage/types';
@@ -33,6 +33,7 @@ const CarTrack = ({ car, trackWidth }: Props) => {
   const [elapsed, setElapsed] = useState(0);
   const winner = useSelector((state: RootState) => state.winners.winner[car.id]);
   const hasFinishedRef = useRef(false);
+  const raceInProgress = useAppSelector(state => state.garage.raceState.status === 'starting');
 
   useCarMovement(car, carRef, {
     onFinish: () => {
@@ -173,8 +174,18 @@ const CarTrack = ({ car, trackWidth }: Props) => {
 
       <div className={styles.secondLine}>
         <div className={styles.buttonWrapper}>
-          <Button text="Start" onClick={() => handleStart()} className={styles.startButton} />
-          <Button text="Reset" onClick={() => handleReset()} className={styles.resetButton} />
+          <Button
+            text="Start"
+            onClick={() => handleStart()}
+            className={styles.startButton}
+            disabled={raceInProgress}
+          />
+          <Button
+            text="Reset"
+            onClick={() => handleReset()}
+            className={styles.resetButton}
+            disabled={car.positionX === 0}
+          />
         </div>
 
         <div className={styles.trackWrapper}>

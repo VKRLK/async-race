@@ -1,7 +1,7 @@
 // src/components/CarTrack/CarTrackControls.tsx
 
 import { useState } from 'react';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { deleteCarThunk } from '../../store/garage/actions';
 import type { CarType } from '../../store/garage/types';
 
@@ -20,6 +20,7 @@ interface Props {
 const CarTrackControls = ({ car }: Props) => {
   const dispatch = useAppDispatch();
   const [isEditing, setIsEditing] = useState(false);
+  const raceInProgress = useAppSelector(state => state.garage.raceState.status === 'starting');
 
   const handleDelete = () => {
     dispatch(deleteCarThunk(car.id));
@@ -51,6 +52,7 @@ const CarTrackControls = ({ car }: Props) => {
         onClick={() => setIsEditing(true)}
         className={classNames(styles.editButton)}
         color="var(--primary)"
+        disabled={raceInProgress}
       />
 
       <Button
@@ -58,6 +60,7 @@ const CarTrackControls = ({ car }: Props) => {
         onClick={() => handleDelete()}
         className={classNames(styles.deleteButton)}
         color="var(--error)"
+        disabled={raceInProgress}
       />
     </div>
   );
