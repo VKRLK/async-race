@@ -1,17 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GaragePage } from './pages/GaragePage/GaragePage';
 import WinnerPage from './pages/WinnerPage/WinnerPage';
-import ThemeToggler from './components/ThemeToggler/ThemeToggler';
 import './App.scss';
 
 function App() {
   return (
     <BrowserRouter basename="/async-race">
-      <div className="theme-toggler-global">
-        <ThemeToggler />
-      </div>
       <Routes>
-        <Route path="/" element={<Navigate to="/garage" replace />} />
+        <Route path="/" element={<Navigate to="/garage" />} />
         <Route path="/garage" element={<GaragePage />} />
         <Route path="/winners" element={<WinnerPage />} />
       </Routes>
