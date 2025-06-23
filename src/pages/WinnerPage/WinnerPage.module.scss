@@ -4,8 +4,24 @@
   padding: 1.5rem;
 }
 
-.navButton {
-  margin-bottom: 1.5rem;
+.garageButton {
+  position: fixed;
+  bottom: 5vh;
+  right: 2vw;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--btn-border);
+  background-image: url(../../assets/race.svg);
+  background-position: center;
+  background-size: cover;
+  z-index: 10;
+  font-size: large;
+  font-weight: bold;
+}
+
+:global(.text--lowered) {
+  transform: translateY(24px);
 }
 
 .table {

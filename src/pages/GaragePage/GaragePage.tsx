@@ -112,27 +112,18 @@ export function GaragePage() {
 
   return (
     <div className={styles.garagePage}>
-      <h1>Garage</h1>
+      <div className={styles.title}>Garage</div>
 
       <Button
         text="Winners"
         onClick={() => navigate('/winners')}
-        className={styles.navButton}
+        className={styles.winnersButton}
+        textClassName="text--lowered"
         disabled={raceInProgress}
       />
 
       <RaceControlPanel paginatedCars={cars} trackWidth={trackWidth} />
       <CarEditor mode="create" />
-
-      <div className={styles.pagination}>
-        <button onClick={handlePrevPage} disabled={page === 1}>
-          Prev
-        </button>
-        <span>Page {page}</span>
-        <button onClick={handleNextPage} disabled={page * CARS_PER_PAGE >= total}>
-          Next
-        </button>
-      </div>
 
       <div ref={trackContainerRef} className={styles.trackContainer}>
         <ul className={styles.trackList}>
@@ -140,6 +131,16 @@ export function GaragePage() {
             <CarTrack key={`${car.id}-${trackWidth}`} car={car} trackWidth={trackWidth} />
           ))}
         </ul>
+      </div>
+
+      <div className={styles.pagination}>
+        <Button text="Prev" onClick={() => handlePrevPage()} disabled={page === 1} />
+        <span> {page} </span>
+        <Button
+          text="Next"
+          onClick={() => handleNextPage()}
+          disabled={page * CARS_PER_PAGE >= total}
+        />
       </div>
     </div>
   );

@@ -65,7 +65,12 @@ const WinnerPage: React.FC = () => {
   return (
     <div className={styles.winnerPage}>
       <h1>Winners</h1>
-      <Button text="Garage" onClick={() => navigate('/garage')} className={styles.navButton} />
+      <Button
+        text="Garage"
+        onClick={() => navigate('/garage')}
+        textClassName="text--lowered"
+        className={styles.garageButton}
+      />
 
       {winners.length === 0 ? (
         <p>No winners yet.</p>

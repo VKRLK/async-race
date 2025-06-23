@@ -1,3 +1,4 @@
+//_variables.scss
 /* Default Theme (System / Light fallback) */
 :root {
   --bg: #f5e9d3; // песочно-теплый, не яркий
@@ -6,6 +7,9 @@
   --primary-hover: #d88f00;
   --secondary: #fff5e5; // для карточек/элементов
   --border: #e0c9a0;
+  --btn-color: #e4e7ec; // цвет текста на кнопках
+  --btn-border: #4c4f6c; // цвет рамки кнопок
+  --btn-background: #5a73d7; // кнопки и элементы управления
   --error: #b94a48;
   --error-hover: #8a2c29;
   --track-bg: #c0b8ae; // светлый, теплый асфальт
@@ -20,6 +24,11 @@
   --primary-hover: #5a73d7;
   --secondary: #373a59; // карточки/фоновые блоки
   --border: #4c4f6c;
+
+  --btn-color: #000000; // цвет текста на кнопках
+  --btn-border: #6272ff; // цвет рамки кнопок
+  --btn-background: #849cfc; // кнопки и элементы управления
+
   --error: #ff7676;
   --error-hover: #cc4c4c;
   --track-bg: #3a3d4d; // тёмный асфальт, ближе к фиолетовому

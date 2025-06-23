@@ -2,20 +2,20 @@
 @use 'sass:map';
 
 $breakpoints: (
-	'sm': 600px,
-	'lg': 1280px,
+  'sm': 500px,
+  'lg': 1280px,
 );
 
 @mixin respond($breakpoint, $extra: null) {
-	@if map.has-key($breakpoints, $breakpoint) {
-		$media: '(max-width: #{map.get($breakpoints, $breakpoint)})';
+  @if map.has-key($breakpoints, $breakpoint) {
+    $media: '(max-width: #{map.get($breakpoints, $breakpoint)})';
 
-		@if $extra != null {
-			$media: '#{$media}, #{$extra}';
-		}
+    @if $extra != null {
+      $media: '#{$media}, #{$extra}';
+    }
 
-		@media #{$media} {
-			@content;
-		}
-	}
+    @media #{$media} {
+      @content;
+    }
+  }
 }

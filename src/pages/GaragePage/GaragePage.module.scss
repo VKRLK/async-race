@@ -1,18 +1,35 @@
 /* src/pages/GaragePage.module.scss */
+@use '../../styles/index' as *;
 
 .garagePage {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
-.navButton {
-  margin-bottom: 1.5rem;
-}
-
-.pagination {
+.title {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-  gap: 1rem;
+  justify-content: center;
+  font-size: large;
+  @include titleText;
+}
+
+.winnersButton {
+  position: fixed;
+  bottom: 5vh;
+  right: 2vw;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--btn-border);
+  background-image: url(../../assets/winners.svg);
+  background-position: center;
+  background-size: cover;
+  z-index: 10;
+  font-size: large;
+  font-weight: bold;
+}
+:global(.text--lowered) {
+  transform: translateY(24px);
 }
 
 .trackContainer {
@@ -24,4 +41,13 @@
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.pagination {
+  @include bodyText;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem;
+  gap: 1rem;
 }

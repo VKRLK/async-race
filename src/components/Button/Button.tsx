@@ -12,6 +12,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: string;
   backgroundColor?: string;
   borderColor?: string;
+  textClassName?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -25,6 +26,7 @@ const Button: React.FC<ButtonProps> = ({
   color,
   backgroundColor,
   borderColor,
+  textClassName,
   ...props
 }) => {
   const navigate = useNavigate();
@@ -42,23 +44,9 @@ const Button: React.FC<ButtonProps> = ({
       className={classNames(styles.btn, styles[`btn--${variant}`], styles[appearance], className)}
       onClick={handleClick}
       {...props}
-      style={{
-        color,
-        backgroundColor,
-        borderColor,
-        ...props.style,
-      }}
     >
-      {icon && (
-        <span className={styles.iconWrapper} style={{ color }}>
-          {icon}
-        </span>
-      )}
-      {text && (
-        <span className={styles.text} style={{ color }}>
-          {text}
-        </span>
-      )}
+      {icon && <span className={styles.iconWrapper}>{icon}</span>}
+      {text && <span className={classNames(styles.text, textClassName)}>{text}</span>}
     </button>
   );
 };
