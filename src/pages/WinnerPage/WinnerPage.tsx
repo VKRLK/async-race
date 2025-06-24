@@ -15,6 +15,7 @@ import type { WinnerType } from '../../store/winners/types';
 import { WINNERS_PER_PAGE } from '../../utils/constants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import CarSvg from '../../components/CarSvg/CarSvg';
 
 const WinnerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -100,15 +101,9 @@ const WinnerPage: React.FC = () => {
                   <tr key={winner.id}>
                     <td>{(page - 1) * WINNERS_PER_PAGE + index + 1}</td>
                     <td>
-                      <div
-                        style={{
-                          width: '30px',
-                          height: '16px',
-                          backgroundColor: winner.color,
-                          borderRadius: '4px',
-                          margin: '0 auto',
-                        }}
-                      />
+                      <div className={styles.carWrapper}>
+                        <CarSvg color={winner.color} />
+                      </div>
                     </td>
                     <td>{winner.name}</td>
                     <td>{winner.wins}</td>

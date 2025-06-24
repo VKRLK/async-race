@@ -15,7 +15,7 @@ const CarSvg = ({ color }: CarSvgProps) => (
     clipRule="evenodd"
     style={{
       color,
-      transform: 'rotate(90deg) translateY(-50%)',
+      transform: 'rotate(90deg)',
       transformOrigin: 'center',
       width: '60px',
       height: '41px',

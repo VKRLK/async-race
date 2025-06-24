@@ -62,7 +62,7 @@
 .table {
   width: 80%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   height: 100%;
 
   @include respond('sm') {
@@ -88,7 +88,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-
   @include respond('sm') {
     padding: 0;
   }
@@ -114,4 +113,10 @@
     border: none;
     background: transparent;
   }
+}
+
+.carWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
