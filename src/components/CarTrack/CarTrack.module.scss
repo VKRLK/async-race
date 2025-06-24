@@ -58,7 +58,7 @@
     position: relative;
     gap: 0.5rem;
 
-    @media (max-width: 500px) {
+    @include respond('sm') {
       width: 15vw;
     }
 

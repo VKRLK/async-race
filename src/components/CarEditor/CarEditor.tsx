@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createCar, updateCar } from '../../store/garage/actions';
 import Button from '../Button/Button';
 import styles from './CarEditor.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
   mode: 'create' | 'edit';
@@ -62,6 +64,8 @@ const CarEditor = ({
         onClick={handleSubmit}
         variant="primary"
         disabled={raceInProgress}
+        icon={<FontAwesomeIcon icon={faPlus} />}
+        hideTextOnMobile={true}
       />
       {mode === 'edit' && onCancelEdit && (
         <Button

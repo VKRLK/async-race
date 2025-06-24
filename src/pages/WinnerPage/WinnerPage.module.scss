@@ -16,6 +16,10 @@
 
   @include titleText;
   margin: 1rem;
+
+  @include respond('sm') {
+    margin: 4rem 0;
+  }
 }
 
 .noWinners {
@@ -60,6 +64,10 @@
   border-collapse: collapse;
   table-layout: fixed;
   height: 100%;
+
+  @include respond('sm') {
+    width: 100%;
+  }
 }
 
 .table thead tr {
@@ -80,6 +88,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @include respond('sm') {
+    padding: 0;
+  }
 }
 
 .pagination {

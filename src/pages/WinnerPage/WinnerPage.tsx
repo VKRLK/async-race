@@ -13,6 +13,8 @@ import Button from '../../components/Button/Button';
 import styles from './WinnerPage.module.scss';
 import type { WinnerType } from '../../store/winners/types';
 import { WINNERS_PER_PAGE } from '../../utils/constants';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const WinnerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -125,9 +127,22 @@ const WinnerPage: React.FC = () => {
         </>
       )}
       <div className={styles.pagination}>
-        <Button text="Prev" onClick={handlePrevPage} disabled={page === 1} />
+        <Button
+          text="Prev"
+          onClick={handlePrevPage}
+          disabled={page === 1}
+          hideTextOnMobile={true}
+          icon={<FontAwesomeIcon icon={faChevronLeft} />}
+        />
         <span>Page {page}</span>
-        <Button text="Next" onClick={handleNextPage} disabled={winners.length < WINNERS_PER_PAGE} />
+        <Button
+          text="Next"
+          onClick={handleNextPage}
+          disabled={winners.length < WINNERS_PER_PAGE}
+          hideTextOnMobile={true}
+          icon={<FontAwesomeIcon icon={faChevronRight} />}
+          isIconFirst={false}
+        />
       </div>
     </div>
   );

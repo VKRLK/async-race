@@ -16,6 +16,8 @@ import styles from './GaragePage.module.scss';
 import type { CarType } from '../../store/garage/types';
 import { useTrackResizeObserver } from '../../hooks/useTrackResizeObserver';
 import { incrementWinFor } from '../../store/winners/actions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 export function GaragePage() {
   const dispatch = useAppDispatch();
@@ -158,12 +160,17 @@ export function GaragePage() {
           text="Prev"
           onClick={() => handlePrevPage()}
           disabled={raceInProgress || page === 1}
+          hideTextOnMobile={true}
+          icon={<FontAwesomeIcon icon={faChevronLeft} />}
         />
         <span> {page} </span>
         <Button
           text="Next"
           onClick={() => handleNextPage()}
           disabled={raceInProgress || page * CARS_PER_PAGE >= total}
+          hideTextOnMobile={true}
+          icon={<FontAwesomeIcon icon={faChevronRight} />}
+          isIconFirst={false}
         />
       </div>
     </div>

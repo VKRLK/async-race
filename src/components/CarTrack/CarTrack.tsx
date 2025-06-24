@@ -17,6 +17,8 @@ import CarTrackControls from './CarTrackControls';
 import styles from './CarTrack.module.scss';
 import Button from '../Button/Button';
 import CarSvg from '../CarSvg/CarSvg';
+import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export type FastestRef = React.MutableRefObject<{
   id: number;
@@ -188,12 +190,19 @@ const CarTrack = ({ car, trackWidth, fastestFinishRef }: Props) => {
             onClick={() => handleStart()}
             className={styles.startButton}
             disabled={raceInProgress}
+            hideTextOnMobile={true}
+            alwaysShowIcon={false}
+            icon={<FontAwesomeIcon icon={faPlay} />}
           />
+
           <Button
             text="Stop"
             onClick={() => handleStop()}
             className={styles.resetButton}
             disabled={car.positionX === 0}
+            hideTextOnMobile={true}
+            alwaysShowIcon={false}
+            icon={<FontAwesomeIcon icon={faStop} />}
           />
         </div>
 
