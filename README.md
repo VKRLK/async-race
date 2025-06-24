@@ -47,7 +47,7 @@ https://vkrlk.github.io/async-race/
 - [x] Responsive Animation (30 points)
 - [x] Start Race Button (10 points)
 - [x] Reset Race Button (15 points)
-- [x] Winner Announcement (5 points)
+- [] Winner Announcement (5 points)
 - [x] Button States (20 points)
 - [x] Actions during the race (50 points)
 

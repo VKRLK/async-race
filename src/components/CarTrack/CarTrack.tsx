@@ -133,7 +133,7 @@ const CarTrack = ({ car, trackWidth, fastestFinishRef }: Props) => {
     el.style.left = '0px';
   }, [resetVersion]);
 
-  const handleReset = async () => {
+  const handleStop = async () => {
     try {
       await stopEngine(car.id);
       dispatch(updateCarStatus({ id: car.id, status: { status: 'stopped' } }));
@@ -190,8 +190,8 @@ const CarTrack = ({ car, trackWidth, fastestFinishRef }: Props) => {
             disabled={raceInProgress}
           />
           <Button
-            text="Reset"
-            onClick={() => handleReset()}
+            text="Stop"
+            onClick={() => handleStop()}
             className={styles.resetButton}
             disabled={car.positionX === 0}
           />
